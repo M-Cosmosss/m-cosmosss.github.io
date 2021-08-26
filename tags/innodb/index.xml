@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Posts on M-Cosmosss</title>
-    <link>https://cosmos.red/post/</link>
-    <description>Recent content in Posts on M-Cosmosss</description>
+    <title>innodb on M-Cosmosss</title>
+    <link>https://cosmos.red/tags/innodb/</link>
+    <description>Recent content in innodb on M-Cosmosss</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 25 Aug 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://cosmos.red/post/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 25 Aug 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://cosmos.red/tags/innodb/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>InnoDB</title>
       <link>https://cosmos.red/p/innodb/</link>
@@ -20,15 +20,6 @@ Purge Thread 1.1 版本后，回收 Undo 页由主线程转为此线程负责
 Page Cleaner Thread 1.2.x 版本后，刷新脏页由主线程转为此线程负责
 缓冲池 页类型  索引页、数据页、undo 页、插入缓冲 (insert buffer)、自适应哈希索引(adaptive hash index&amp;gt;、InnoDB 存储的锁信息（lockinfo)、数据字典信息(data dictionary) 等  innodb_buffer_pool_instances 设定缓冲池数量
 池内存管理 改动过的 LRU 算法 LRU 列表中加入了 midpoint 位置：最新访问的页并不是直接放入到 LRU 列表的首部，而是放入到 LRU 列表的 midpoint 位置（默认配置下，该位置在 LRU 列表长度的 5/8 处）</description>
-    </item>
-    
-    <item>
-      <title>Hello World</title>
-      <link>https://cosmos.red/p/hello-world/</link>
-      <pubDate>Wed, 20 May 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://cosmos.red/p/hello-world/</guid>
-      <description>Now Loading!!! </description>
     </item>
     
   </channel>
