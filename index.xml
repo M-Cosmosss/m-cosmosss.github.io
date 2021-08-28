@@ -36,7 +36,20 @@
 &lt;ul&gt;
 &lt;li&gt;索引页、数据页、undo 页、插入缓冲 (insert buffer)、自适应哈希索引(adaptive hash index&amp;gt;、InnoDB 存储的锁信息（lockinfo)、数据字典信息(data dictionary) 等&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;&lt;img src=&#34;http://pic.cosmos.red//image-20210717031742053.png&#34; alt=&#34;image-20210717031742053&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;http://pic.cosmos.red//image-20210717031742053.png&#34; &gt;
+		&lt;img src=&#34;http://pic.cosmos.red//image-20210717031742053.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;image-20210717031742053&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;image-20210717031742053&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
 &lt;h4 id=&#34;innodb_buffer_pool_instances&#34;&gt;innodb_buffer_pool_instances&lt;/h4&gt;
 &lt;p&gt;设定缓冲池数量&lt;/p&gt;
 &lt;h3 id=&#34;池内存管理&#34;&gt;池内存管理&lt;/h3&gt;
@@ -46,7 +59,20 @@
 &lt;p&gt;innodb_old_blocks_time 控制的 Old 链表头部页面的转移策略。该 Page 需要在 Old 链表停留超过该时间，之后再次被访问，才会移动到 Young 链表。这么操作是避免 Young 链表被那些只在 innodb_old_blocks_time 时间间隔内频繁访问，之后就不被访问的页面塞满，从而有效的保护 Young 链表。&lt;/p&gt;
 &lt;h4 id=&#34;缓冲命中率&#34;&gt;缓冲命中率&lt;/h4&gt;
 &lt;p&gt;Buffer pool hit rate，表示缓冲池的命中率，这个例子中为 100%，说明缓冲池运行状态非常良好。通常该值不应该小于 95%。若发生 Buffer pool hit rate 的值小于 95% 这种情况，用户需要观察是否是由于全表扫描引起的 LRU 列表被污染的问题。&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;http://pic.cosmos.red//image-20210719035257307.png&#34; alt=&#34;image-20210719035257307&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;http://pic.cosmos.red//image-20210719035257307.png&#34; &gt;
+		&lt;img src=&#34;http://pic.cosmos.red//image-20210719035257307.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;image-20210719035257307&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;image-20210719035257307&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
 &lt;h3 id=&#34;checkpoint&#34;&gt;Checkpoint&lt;/h3&gt;
 &lt;p&gt;将缓冲池中的脏页刷回到磁盘&lt;/p&gt;
 &lt;ul&gt;
@@ -194,15 +220,54 @@
 &lt;li&gt;InnoDB中一般为2-4层，以适应磁盘随机读取开销较大的特性，在查询时降低随机 IO 次数&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h4 id=&#34;插入&#34;&gt;插入&lt;/h4&gt;
-&lt;p&gt;&lt;img src=&#34;http://pic.cosmos.red//image-20210823100442159.png&#34; alt=&#34;image-20210823100442159&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;http://pic.cosmos.red//image-20210823100442159.png&#34; &gt;
+		&lt;img src=&#34;http://pic.cosmos.red//image-20210823100442159.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;image-20210823100442159&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;image-20210823100442159&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
 &lt;p&gt;以此图为例，插入70&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;
-&lt;p&gt;拆分：&lt;img src=&#34;http://pic.cosmos.red//image-20210823100516595.png&#34; alt=&#34;image-20210823100516595&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;拆分：&lt;figure 
+	&gt;
+	&lt;a href=&#34;http://pic.cosmos.red//image-20210823100516595.png&#34; &gt;
+		&lt;img src=&#34;http://pic.cosmos.red//image-20210823100516595.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;image-20210823100516595&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;image-20210823100516595&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
 &lt;/li&gt;
 &lt;li&gt;
 &lt;p&gt;旋转：当左右兄弟节点未满时，优先使用旋转提高效率&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;http://pic.cosmos.red//image-20210823100624552.png&#34; alt=&#34;image-20210823100624552&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;http://pic.cosmos.red//image-20210823100624552.png&#34; &gt;
+		&lt;img src=&#34;http://pic.cosmos.red//image-20210823100624552.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;image-20210823100624552&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;image-20210823100624552&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
 &lt;/li&gt;
 &lt;/ul&gt;
 &lt;h3 id=&#34;索引&#34;&gt;索引&lt;/h3&gt;
@@ -223,7 +288,20 @@
 &lt;h4 id=&#34;辅助索引非聚焦索引&#34;&gt;辅助索引/非聚焦索引&lt;/h4&gt;
 &lt;p&gt;叶子节点只存放主键，因此需要根据主键在聚焦索引里二次查询才能得到完整行内容，这个过程称为回表&lt;/p&gt;
 &lt;h4 id=&#34;联合索引&#34;&gt;联合索引&lt;/h4&gt;
-&lt;p&gt;&lt;img src=&#34;http://pic.cosmos.red//image-20210824170734902.png&#34; alt=&#34;image-20210824170734902&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;http://pic.cosmos.red//image-20210824170734902.png&#34; &gt;
+		&lt;img src=&#34;http://pic.cosmos.red//image-20210824170734902.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;image-20210824170734902&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;image-20210824170734902&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
 &lt;p&gt;对多个列组合起来的索引，如 (a,b) 索引将先按 a 再按 b 排序。因此针对 a 或者 a&amp;amp;&amp;amp;b 的条件查询都可以使用该索引，但是 b 条件不行，因为此联合索引没有按 b 的顺序&lt;/p&gt;
 &lt;p&gt;也因为多列索引都以排序这个特性，可以免去部分范围查询的二次排序&lt;/p&gt;
 &lt;h4 id=&#34;覆盖索引&#34;&gt;覆盖索引&lt;/h4&gt;
@@ -255,12 +333,51 @@
 &lt;/blockquote&gt;
 &lt;h4 id=&#34;全文索引&#34;&gt;全文索引&lt;/h4&gt;
 &lt;p&gt;InnoDB 使用 full inverted index 形式的倒排索引，记录了每个单词出现在哪个文档以及在其中的位置&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;http://pic.cosmos.red//image-20210825174421628.png&#34; alt=&#34;image-20210825174421628&#34;  /&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;http://pic.cosmos.red//image-20210825174429861.png&#34; alt=&#34;image-20210825174429861&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;http://pic.cosmos.red//image-20210825174421628.png&#34; &gt;
+		&lt;img src=&#34;http://pic.cosmos.red//image-20210825174421628.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;image-20210825174421628&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;image-20210825174421628&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;http://pic.cosmos.red//image-20210825174429861.png&#34; &gt;
+		&lt;img src=&#34;http://pic.cosmos.red//image-20210825174429861.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;image-20210825174429861&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;image-20210825174429861&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
 &lt;h5 id=&#34;用法&#34;&gt;用法&amp;hellip;&lt;/h5&gt;
 &lt;h2 id=&#34;p6-锁&#34;&gt;P6 锁&lt;/h2&gt;
 &lt;h3 id=&#34;lock--latch&#34;&gt;lock / latch&lt;/h3&gt;
-&lt;p&gt;&lt;img src=&#34;http://pic.cosmos.red//image-20210825182952229.png&#34; alt=&#34;image-20210825182952229&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;http://pic.cosmos.red//image-20210825182952229.png&#34; &gt;
+		&lt;img src=&#34;http://pic.cosmos.red//image-20210825182952229.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;image-20210825182952229&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;image-20210825182952229&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
 &lt;h3 id=&#34;mvcc&#34;&gt;MVCC&lt;/h3&gt;
 </description>
         </item>

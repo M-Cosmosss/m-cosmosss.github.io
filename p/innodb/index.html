@@ -16,7 +16,9 @@
     <link rel="shortcut icon" href="img/icon.png" />
 
     </head>
-    <body class="">
+    <body class="
+    article-page has-toc
+">
     <script>
         (function() {
             const colorSchemeKey = 'StackColorScheme';
@@ -33,172 +35,32 @@
         if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
             
 
-            document.body.dataset.scheme = 'dark';
+            document.documentElement.dataset.scheme = 'dark';
         } else {
-            document.body.dataset.scheme = 'light';
+            document.documentElement.dataset.scheme = 'light';
         }
     })();
-</script><div class="container main-container flex on-phone--column extended article-page with-toolbar">
-            <aside class="sidebar left-sidebar sticky">
-    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
-        <span class="hamburger-box">
-            <span class="hamburger-inner"></span>
-        </span>
-    </button>
-
-    <header class="site-info">
-        
-            <figure class="site-avatar">
-                
-                    
-                    
-                    
-                        
-                        <img src="/img/cosmos_hud45ce022a3a561d610272a1c4d9aadc1_15733_300x0_resize_q75_box.jpg" width="300"
-                            height="300" class="site-logo" loading="lazy" alt="Avatar">
-                    
-                
-
-                
-            </figure>
-        
-        <h1 class="site-name"><a href="https://cosmos.red">M-Cosmosss</a></h1>
-        <h2 class="site-description">Now Loading!!!</h2>
-    </header>
-
-    <ol class="menu" id="main-menu">
-        
-        
-        
-
-        <li >
-            <a href='/'>
-                
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <polyline points="5 12 3 12 12 3 21 12 19 12" />
-  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
-  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
-</svg>
-
-
-
-                
-                <span>Home</span>
-            </a>
-        </li>
-        
-        
-
-        <li >
-            <a href='/about/'>
-                
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <circle cx="12" cy="7" r="4" />
-  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
-</svg>
-
-
-
-                
-                <span>About</span>
-            </a>
-        </li>
-        
-        
-
-        <li >
-            <a href='/archives/'>
-                
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <rect x="3" y="4" width="18" height="4" rx="2" />
-  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
-  <line x1="10" y1="12" x2="14" y2="12" />
-</svg>
-
-
-
-                
-                <span>Archives</span>
-            </a>
-        </li>
-        
-        
-
-        <li >
-            <a href='/friends/'>
-                
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-users" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-  <circle cx="9" cy="7" r="4" />
-  <path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
-  <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-  <path d="M21 21v-2a4 4 0 0 0 -3 -3.85" />
-</svg>
-                
-                <span>Friends</span>
-            </a>
-        </li>
-        
-        
-
-        <li >
-            <a href='/search/'>
-                
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <circle cx="10" cy="10" r="7" />
-  <line x1="21" y1="21" x2="15" y2="15" />
-</svg>
-
-
-
-                
-                <span>Search</span>
-            </a>
-        </li>
-        
-
-        
-            <li id="dark-mode-toggle">
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <circle cx="8" cy="12" r="2" />
-  <rect x="2" y="6" width="20" height="12" rx="6" />
-</svg>
-
-
-
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <circle cx="16" cy="12" r="2" />
-  <rect x="2" y="6" width="20" height="12" rx="6" />
-</svg>
-
-
-
-                <span>Dark Mode</span>
-            </li>
-        
-    </ol>
-</aside>
-
-            <main class="main full-width">
-    <div id="article-toolbar">
-        <a href="https://cosmos.red" class="back-home">
-            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-chevron-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+</script>
+<div class="container main-container flex 
+    
+        extended
+    
+">
+    
+        <div id="article-toolbar">
+            <a href="https://cosmos.red" class="back-home">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-chevron-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
   <path stroke="none" d="M0 0h24v24H0z"/>
   <polyline points="15 6 9 12 15 18" />
 </svg>
 
 
 
-            <span>Back</span>
-        </a>
-    </div>
-
+                <span>Back</span>
+            </a>
+        </div>
+    
+<main class="main full-width">
     <article class="has-image main-article">
     <header class="article-header">
         <div class="article-image">
@@ -233,17 +95,29 @@
     <h3 class="article-subtitle">
         《Mysql 技术内幕》阅读笔记
     </h3>
+    
+
+    
     <footer class="article-time">
-        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
   <path stroke="none" d="M0 0h24v24H0z"/>
-  <circle cx="12" cy="12" r="9" />
-  <polyline points="12 7 12 12 15 15" />
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
 </svg>
+                <time class="article-time--published">Aug 25, 2020</time>
+            </div>
+        
 
-
-
-        <time class="article-time--published">Aug 25, 2020</time>
-    </footer></div>
+        
+    </footer>
+    
+</div>
 </header>
 
     <section class="article-content">
@@ -271,7 +145,20 @@
 <ul>
 <li>索引页、数据页、undo 页、插入缓冲 (insert buffer)、自适应哈希索引(adaptive hash index&gt;、InnoDB 存储的锁信息（lockinfo)、数据字典信息(data dictionary) 等</li>
 </ul>
-<p><img src="http://pic.cosmos.red//image-20210717031742053.png" alt="image-20210717031742053"  /></p>
+<p><figure 
+	>
+	<a href="http://pic.cosmos.red//image-20210717031742053.png" >
+		<img src="http://pic.cosmos.red//image-20210717031742053.png"
+			
+			
+			
+			loading="lazy"
+			alt="image-20210717031742053">
+	</a>
+	
+	<figcaption>image-20210717031742053</figcaption>
+	
+</figure></p>
 <h4 id="innodb_buffer_pool_instances">innodb_buffer_pool_instances</h4>
 <p>设定缓冲池数量</p>
 <h3 id="池内存管理">池内存管理</h3>
@@ -281,7 +168,20 @@
 <p>innodb_old_blocks_time 控制的 Old 链表头部页面的转移策略。该 Page 需要在 Old 链表停留超过该时间，之后再次被访问，才会移动到 Young 链表。这么操作是避免 Young 链表被那些只在 innodb_old_blocks_time 时间间隔内频繁访问，之后就不被访问的页面塞满，从而有效的保护 Young 链表。</p>
 <h4 id="缓冲命中率">缓冲命中率</h4>
 <p>Buffer pool hit rate，表示缓冲池的命中率，这个例子中为 100%，说明缓冲池运行状态非常良好。通常该值不应该小于 95%。若发生 Buffer pool hit rate 的值小于 95% 这种情况，用户需要观察是否是由于全表扫描引起的 LRU 列表被污染的问题。</p>
-<p><img src="http://pic.cosmos.red//image-20210719035257307.png" alt="image-20210719035257307"  /></p>
+<p><figure 
+	>
+	<a href="http://pic.cosmos.red//image-20210719035257307.png" >
+		<img src="http://pic.cosmos.red//image-20210719035257307.png"
+			
+			
+			
+			loading="lazy"
+			alt="image-20210719035257307">
+	</a>
+	
+	<figcaption>image-20210719035257307</figcaption>
+	
+</figure></p>
 <h3 id="checkpoint">Checkpoint</h3>
 <p>将缓冲池中的脏页刷回到磁盘</p>
 <ul>
@@ -429,15 +329,54 @@
 <li>InnoDB中一般为2-4层，以适应磁盘随机读取开销较大的特性，在查询时降低随机 IO 次数</li>
 </ul>
 <h4 id="插入">插入</h4>
-<p><img src="http://pic.cosmos.red//image-20210823100442159.png" alt="image-20210823100442159"  /></p>
+<p><figure 
+	>
+	<a href="http://pic.cosmos.red//image-20210823100442159.png" >
+		<img src="http://pic.cosmos.red//image-20210823100442159.png"
+			
+			
+			
+			loading="lazy"
+			alt="image-20210823100442159">
+	</a>
+	
+	<figcaption>image-20210823100442159</figcaption>
+	
+</figure></p>
 <p>以此图为例，插入70</p>
 <ul>
 <li>
-<p>拆分：<img src="http://pic.cosmos.red//image-20210823100516595.png" alt="image-20210823100516595"  /></p>
+<p>拆分：<figure 
+	>
+	<a href="http://pic.cosmos.red//image-20210823100516595.png" >
+		<img src="http://pic.cosmos.red//image-20210823100516595.png"
+			
+			
+			
+			loading="lazy"
+			alt="image-20210823100516595">
+	</a>
+	
+	<figcaption>image-20210823100516595</figcaption>
+	
+</figure></p>
 </li>
 <li>
 <p>旋转：当左右兄弟节点未满时，优先使用旋转提高效率</p>
-<p><img src="http://pic.cosmos.red//image-20210823100624552.png" alt="image-20210823100624552"  /></p>
+<p><figure 
+	>
+	<a href="http://pic.cosmos.red//image-20210823100624552.png" >
+		<img src="http://pic.cosmos.red//image-20210823100624552.png"
+			
+			
+			
+			loading="lazy"
+			alt="image-20210823100624552">
+	</a>
+	
+	<figcaption>image-20210823100624552</figcaption>
+	
+</figure></p>
 </li>
 </ul>
 <h3 id="索引">索引</h3>
@@ -458,7 +397,20 @@
 <h4 id="辅助索引非聚焦索引">辅助索引/非聚焦索引</h4>
 <p>叶子节点只存放主键，因此需要根据主键在聚焦索引里二次查询才能得到完整行内容，这个过程称为回表</p>
 <h4 id="联合索引">联合索引</h4>
-<p><img src="http://pic.cosmos.red//image-20210824170734902.png" alt="image-20210824170734902"  /></p>
+<p><figure 
+	>
+	<a href="http://pic.cosmos.red//image-20210824170734902.png" >
+		<img src="http://pic.cosmos.red//image-20210824170734902.png"
+			
+			
+			
+			loading="lazy"
+			alt="image-20210824170734902">
+	</a>
+	
+	<figcaption>image-20210824170734902</figcaption>
+	
+</figure></p>
 <p>对多个列组合起来的索引，如 (a,b) 索引将先按 a 再按 b 排序。因此针对 a 或者 a&amp;&amp;b 的条件查询都可以使用该索引，但是 b 条件不行，因为此联合索引没有按 b 的顺序</p>
 <p>也因为多列索引都以排序这个特性，可以免去部分范围查询的二次排序</p>
 <h4 id="覆盖索引">覆盖索引</h4>
@@ -490,12 +442,51 @@
 </blockquote>
 <h4 id="全文索引">全文索引</h4>
 <p>InnoDB 使用 full inverted index 形式的倒排索引，记录了每个单词出现在哪个文档以及在其中的位置</p>
-<p><img src="http://pic.cosmos.red//image-20210825174421628.png" alt="image-20210825174421628"  /></p>
-<p><img src="http://pic.cosmos.red//image-20210825174429861.png" alt="image-20210825174429861"  /></p>
+<p><figure 
+	>
+	<a href="http://pic.cosmos.red//image-20210825174421628.png" >
+		<img src="http://pic.cosmos.red//image-20210825174421628.png"
+			
+			
+			
+			loading="lazy"
+			alt="image-20210825174421628">
+	</a>
+	
+	<figcaption>image-20210825174421628</figcaption>
+	
+</figure></p>
+<p><figure 
+	>
+	<a href="http://pic.cosmos.red//image-20210825174429861.png" >
+		<img src="http://pic.cosmos.red//image-20210825174429861.png"
+			
+			
+			
+			loading="lazy"
+			alt="image-20210825174429861">
+	</a>
+	
+	<figcaption>image-20210825174429861</figcaption>
+	
+</figure></p>
 <h5 id="用法">用法&hellip;</h5>
 <h2 id="p6-锁">P6 锁</h2>
 <h3 id="lock--latch">lock / latch</h3>
-<p><img src="http://pic.cosmos.red//image-20210825182952229.png" alt="image-20210825182952229"  /></p>
+<p><figure 
+	>
+	<a href="http://pic.cosmos.red//image-20210825182952229.png" >
+		<img src="http://pic.cosmos.red//image-20210825182952229.png"
+			
+			
+			
+			loading="lazy"
+			alt="image-20210825182952229">
+	</a>
+	
+	<figcaption>image-20210825182952229</figcaption>
+	
+</figure></p>
 <h3 id="mvcc">MVCC</h3>
 
 </section>
@@ -526,6 +517,7 @@
     </section>
     </footer>
 
+
     
 </article>
 
@@ -534,8 +526,8 @@
     
 </aside>
 
-
-    
+     
+     
         
     <div class="disqus-container">
     <div id="disqus_thread"></div>
@@ -592,9 +584,12 @@
     
     <section class="powerby">
         Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
-        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="2.3.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.2.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
     </section>
 </footer>
+
+
+    
 <div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
 
     
@@ -671,7 +666,143 @@
                 rel="stylesheet" 
                 href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.css"integrity="sha256-SBLU4vv6CA6lHsZ1XyTdhyjJxCjPif/TRkjnsyGAGnE="crossorigin="anonymous"
             >
+
             </main>
+    
+        <aside class="sidebar right-sidebar sticky">
+            <section class="widget archives">
+                <div class="widget-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+                </div>
+                <h2 class="widget-title section-title">Table of contents</h2>
+                
+                <div class="widget--toc">
+                    <nav id="TableOfContents">
+  <ol>
+    <li><a href="#p2">P2</a>
+      <ol>
+        <li><a href="#threads">Threads</a>
+          <ol>
+            <li><a href="#master-thread">Master Thread</a></li>
+            <li><a href="#io-thread">IO Thread</a></li>
+            <li><a href="#purge-thread">Purge Thread</a></li>
+            <li><a href="#page-cleaner-thread">Page Cleaner Thread</a></li>
+          </ol>
+        </li>
+        <li><a href="#缓冲池">缓冲池</a>
+          <ol>
+            <li><a href="#页类型">页类型</a></li>
+            <li><a href="#innodb_buffer_pool_instances">innodb_buffer_pool_instances</a></li>
+          </ol>
+        </li>
+        <li><a href="#池内存管理">池内存管理</a>
+          <ol>
+            <li><a href="#改动过的-lru-算法">改动过的 LRU 算法</a></li>
+            <li><a href="#缓冲命中率">缓冲命中率</a></li>
+          </ol>
+        </li>
+        <li><a href="#checkpoint">Checkpoint</a>
+          <ol>
+            <li><a href="#sharp-checkpoint">Sharp Checkpoint</a></li>
+            <li><a href="#fuzzy-checkpointin">Fuzzy checkpointin</a></li>
+          </ol>
+        </li>
+        <li><a href="#插入缓冲-insert-buffer">插入缓冲 Insert Buffer</a>
+          <ol>
+            <li><a href="#实现">实现</a></li>
+            <li><a href="#使用条件">使用条件</a></li>
+            <li><a href="#merge-场合">Merge 场合</a></li>
+            <li><a href="#change-buffer">change buffer</a></li>
+          </ol>
+        </li>
+        <li><a href="#doublewrite">Doublewrite</a>
+          <ol>
+            <li><a href="#partial-write">partial write</a></li>
+            <li><a href="#实现-1">实现</a></li>
+            <li><a href="#redo-log-能否恢复">redo log 能否恢复</a></li>
+            <li><a href="#redo-log-是否需要保护">redo log 是否需要保护</a></li>
+            <li><a href="#others">others</a></li>
+          </ol>
+        </li>
+        <li><a href="#自适应哈希索引">自适应哈希索引</a>
+          <ol>
+            <li><a href="#自动启用条件">自动启用条件</a></li>
+          </ol>
+        </li>
+        <li><a href="#异步io--刷新邻接页">异步IO / 刷新邻接页</a></li>
+        <li><a href="#启动关闭与恢复">启动关闭与恢复</a>
+          <ol>
+            <li><a href="#innodb_fast-shutdown">innodb_fast shutdown</a></li>
+            <li><a href="#innodb_force_recovery">innodb_force_recovery</a></li>
+          </ol>
+        </li>
+      </ol>
+    </li>
+    <li><a href="#p3">P3</a>
+      <ol>
+        <li><a href="#mysql参数">mysql参数</a></li>
+        <li><a href="#日志文件">日志文件</a>
+          <ol>
+            <li><a href="#error-log">error log</a></li>
+            <li><a href="#slow-log">slow log</a></li>
+          </ol>
+        </li>
+        <li><a href="#查询日志">查询日志</a></li>
+        <li><a href="#bin-log">bin log</a>
+          <ol>
+            <li><a href="#缓存">缓存</a></li>
+            <li><a href="#同步">同步</a></li>
+            <li><a href="#格式">格式</a></li>
+          </ol>
+        </li>
+        <li><a href="#redo-log">redo log</a></li>
+      </ol>
+    </li>
+    <li><a href="#p5-索引与算法">P5 索引与算法</a>
+      <ol>
+        <li><a href="#b-tree">B+ tree</a>
+          <ol>
+            <li><a href="#插入">插入</a></li>
+          </ol>
+        </li>
+        <li><a href="#索引">索引</a>
+          <ol>
+            <li><a href="#创建索引">创建索引</a></li>
+            <li><a href="#聚焦索引">聚焦索引</a></li>
+            <li><a href="#辅助索引非聚焦索引">辅助索引/非聚焦索引</a></li>
+            <li><a href="#联合索引">联合索引</a></li>
+            <li><a href="#覆盖索引">覆盖索引</a></li>
+            <li><a href="#fast-index-creation">Fast Index Creation</a></li>
+            <li><a href="#cardinality">Cardinality</a></li>
+            <li><a href="#mrr--multi-range-read">MRR / Multi-Range Read</a></li>
+            <li><a href="#icp--索引条件下推优化">ICP / 索引条件下推优化</a></li>
+            <li><a href="#全文索引">全文索引</a></li>
+          </ol>
+        </li>
+      </ol>
+    </li>
+    <li><a href="#p6-锁">P6 锁</a>
+      <ol>
+        <li><a href="#lock--latch">lock / latch</a></li>
+        <li><a href="#mvcc">MVCC</a></li>
+      </ol>
+    </li>
+  </ol>
+</nav>
+                </div>
+            </section>
+        </aside>
+    
+
         </div>
         <script 
                 src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.5/dist/vibrant.min.js"integrity="sha256-5NovOZc4iwiAWTYIFiIM7DxKUXKWvpVEuMEPLzcm5/g="crossorigin="anonymous"
