@@ -6,15 +6,14 @@
     <description>Recent content in innodb on M-Cosmosss</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 25 Aug 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://cosmos.red/tags/innodb/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 25 Aug 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://cosmos.red/tags/innodb/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>InnoDB</title>
-      <link>https://cosmos.red/p/innodb/</link>
-      <pubDate>Tue, 25 Aug 2020 00:00:00 +0000</pubDate>
+      <link>https://cosmos.red/p/mysql/</link>
+      <pubDate>Wed, 25 Aug 2021 00:00:00 +0000</pubDate>
       
-      <guid>https://cosmos.red/p/innodb/</guid>
-      <description>[TOC]
-Mysql P2 Threads Master Thread 包含多个循环（主循环，background，flush，suspend）
+      <guid>https://cosmos.red/p/mysql/</guid>
+      <description>Mysql P2 Threads Master Thread 包含多个循环（主循环，background，flush，suspend）
  日志写入磁盘 合并 Insert Buffer 到磁盘 刷新脏页 删除无用 Undo 页 1.2.x 版本前，刷新脏页等 IO 速度硬编码，版本后添加 innodb_io_capacity 代表磁盘速度，此变量影响刷新页的速度  IO Thread InnoDB 使用 Async IO ，IO Thread 负责这些异步 IO 请求的回调
 Purge Thread 1.1 版本后，回收 Undo 页由主线程转为此线程负责
 Page Cleaner Thread 1.2.x 版本后，刷新脏页由主线程转为此线程负责

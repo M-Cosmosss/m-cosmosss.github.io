@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='《Mysql 技术内幕》阅读笔记'><title>InnoDB</title>
+
+<link rel='canonical' href='https://cosmos.red/p/mysql/'>
+
+<link rel="stylesheet" href="/scss/style.min.css"><meta property='og:title' content='InnoDB'>
+<meta property='og:description' content='《Mysql 技术内幕》阅读笔记'>
+<meta property='og:url' content='https://cosmos.red/p/mysql/'>
+<meta property='og:site_name' content='M-Cosmosss'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='innodb' /><meta property='article:tag' content='mysql' /><meta property='article:published_time' content='2021-08-25T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2021-08-25T00:00:00&#43;00:00'/><meta property='og:image' content='https://cosmos.red/p/mysql/b.jpg' />
+<meta name="twitter:title" content="InnoDB">
+<meta name="twitter:description" content="《Mysql 技术内幕》阅读笔记"><meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content='https://cosmos.red/p/mysql/b.jpg' />
+    <link rel="shortcut icon" href="img/icon.png" />
+
+    </head>
+    <body class="
+    article-page has-toc
+">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex 
+    
+        extended
+    
+">
+    
+        <div id="article-toolbar">
+            <a href="https://cosmos.red" class="back-home">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-chevron-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="15 6 9 12 15 18" />
+</svg>
+
+
+
+                <span>Back</span>
+            </a>
+        </div>
+    
+<main class="main full-width">
+    <article class="has-image main-article">
+    <header class="article-header">
+        <div class="article-image">
+            <a href="/p/mysql/">
+                <img src="/p/mysql/b_hu9e6b598faf5d55dba82b6284d47de078_365277_800x0_resize_q75_box.jpg"
+                        srcset="/p/mysql/b_hu9e6b598faf5d55dba82b6284d47de078_365277_800x0_resize_q75_box.jpg 800w, /p/mysql/b_hu9e6b598faf5d55dba82b6284d47de078_365277_1600x0_resize_q75_box.jpg 1600w"
+                        width="800" 
+                        height="413" 
+                        loading="lazy"
+                        alt="Featured image of post InnoDB" />
+                
+            </a>
+        </div>
+    
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/mysql/" style="background-color: #123456; color: #fff;">
+                Mysql
+            </a>
+        
+    </header>
+    
+
+    <h2 class="article-title">
+        <a href="/p/mysql/">InnoDB</a>
+    </h2>
+
+    
+    <h3 class="article-subtitle">
+        《Mysql 技术内幕》阅读笔记
+    </h3>
+    
+
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Aug 25, 2021</time>
+            </div>
+        
+
+        
+    </footer>
+    
+</div>
+</header>
+
+    <section class="article-content">
+    <h1 id="mysql">Mysql</h1>
+<h2 id="p2">P2</h2>
+<h3 id="threads">Threads</h3>
+<h4 id="master-thread">Master Thread</h4>
+<p>包含多个循环（主循环，background，flush，suspend）</p>
+<ul>
+<li>日志写入磁盘</li>
+<li>合并 Insert Buffer 到磁盘</li>
+<li>刷新脏页</li>
+<li>删除无用 Undo 页</li>
+<li>1.2.x 版本前，刷新脏页等 IO 速度硬编码，版本后添加 innodb_io_capacity 代表磁盘速度，此变量影响刷新页的速度</li>
+</ul>
+<h4 id="io-thread">IO Thread</h4>
+<p>InnoDB 使用 Async IO ，IO Thread 负责这些异步 IO 请求的回调</p>
+<h4 id="purge-thread">Purge Thread</h4>
+<p>1.1 版本后，回收 Undo 页由主线程转为此线程负责</p>
+<h4 id="page-cleaner-thread">Page Cleaner Thread</h4>
+<p>1.2.x 版本后，刷新脏页由主线程转为此线程负责</p>
+<h3 id="缓冲池">缓冲池</h3>
+<h4 id="页类型">页类型</h4>
+<ul>
+<li>索引页、数据页、undo 页、插入缓冲 (insert buffer)、自适应哈希索引(adaptive hash index&gt;、InnoDB 存储的锁信息（lockinfo)、数据字典信息(data dictionary) 等</li>
+</ul>
+<p><figure 
+	>
+	<a href="http://pic.cosmos.red//image-20210717031742053.png" >
+		<img src="http://pic.cosmos.red//image-20210717031742053.png"
+			
+			
+			
+			loading="lazy"
+			alt="image-20210717031742053">
+	</a>
+	
+	<figcaption>image-20210717031742053</figcaption>
+	
+</figure></p>
+<h4 id="innodb_buffer_pool_instances">innodb_buffer_pool_instances</h4>
+<p>设定缓冲池数量</p>
+<h3 id="池内存管理">池内存管理</h3>
+<h4 id="改动过的-lru-算法">改动过的 LRU 算法</h4>
+<p>LRU 列表中加入了 midpoint 位置：最新访问的页并不是直接放入到 LRU 列表的首部，而是放入到 LRU 列表的 midpoint 位置（默认配置下，该位置在 LRU 列表长度的 5/8 处）</p>
+<p>若直接将读取到的页放入到 LRU 的首部，那么某些 SQL 操作可能会使缓冲池中的页被刷新出，从而影响缓冲池的效率。常见的这类操作为索引或数据的扫描操作。这类操作需要访问表中的许多页，甚至是全部的页，而这些页通常来说又仅在这次查询操作中需要，并不是活跃的热点数据。如果页被放入 LRU 列表的首部，那么非常可能将所需要的热点数据页从 LRU 列表中移除，而在下一次需要读取该页时，InnoDB 存储引擎需要再次访问磁盘。</p>
+<p>innodb_old_blocks_time 控制的 Old 链表头部页面的转移策略。该 Page 需要在 Old 链表停留超过该时间，之后再次被访问，才会移动到 Young 链表。这么操作是避免 Young 链表被那些只在 innodb_old_blocks_time 时间间隔内频繁访问，之后就不被访问的页面塞满，从而有效的保护 Young 链表。</p>
+<h4 id="缓冲命中率">缓冲命中率</h4>
+<p>Buffer pool hit rate，表示缓冲池的命中率，这个例子中为 100%，说明缓冲池运行状态非常良好。通常该值不应该小于 95%。若发生 Buffer pool hit rate 的值小于 95% 这种情况，用户需要观察是否是由于全表扫描引起的 LRU 列表被污染的问题。</p>
+<p><figure 
+	>
+	<a href="http://pic.cosmos.red//image-20210719035257307.png" >
+		<img src="http://pic.cosmos.red//image-20210719035257307.png"
+			
+			
+			
+			loading="lazy"
+			alt="image-20210719035257307">
+	</a>
+	
+	<figcaption>image-20210719035257307</figcaption>
+	
+</figure></p>
+<h3 id="checkpoint">Checkpoint</h3>
+<p>将缓冲池中的脏页刷回到磁盘</p>
+<ul>
+<li>缩短数据库的恢复时间</li>
+<li>缓冲池不够用时，将脏页刷新到磁盘</li>
+<li>重做日志不可用时，刷新脏页。</li>
+</ul>
+<h4 id="sharp-checkpoint">Sharp Checkpoint</h4>
+<p>一次性将 buffer pool 当中的所有脏页刷新到磁盘数据文件</p>
+<h4 id="fuzzy-checkpointin">Fuzzy checkpointin</h4>
+<p>一个后台进程，定期刷新 buffer pool 当中的脏页</p>
+<ul>
+<li>Master Thread Checkpoint：主线程定期异步地刷新一部分脏页</li>
+<li>FLUSH_LRU_LIST Checkpoint：LRU 中需保证的可用页不足时移除部分尾端页，其中的脏页被刷新</li>
+<li>Async/Sync Flush Checkpoint：redo log 不可用时</li>
+<li>Dirty Page too much Checkpoint：脏页过多，由参数 innodb_max_dirty_pages_pct 控制</li>
+</ul>
+<h3 id="插入缓冲-insert-buffer">插入缓冲 Insert Buffer</h3>
+<p>聚集索引基本为递增，而非聚集索引大多为非顺序，插入操作需要随机写入会影响性能，因此插入缓冲在插入或更新操作，先判断插入的非聚集索引页在缓冲池中，则直接插入；若不在，则先放入到一个 Insert Buffer 对象中。再以一定的频率和情况进行 Insert Buffer 和辅助索引页子节点的 merge（合并）操作，大大的提升了非聚集索引的插入性能。</p>
+<h4 id="实现">实现</h4>
+<p>B+ Tree</p>
+<h4 id="使用条件">使用条件</h4>
+<ul>
+<li>索引是辅助索引：聚集索引本来就是顺序</li>
+<li>索引不是唯一：如果是唯一索引，在插入时，需要查找辅助索引树，判断该记录是否存在以确保唯一性，查找过程就是随机读的过程，因此插入缓冲就没意义了</li>
+</ul>
+<h4 id="merge-场合">Merge 场合</h4>
+<ul>
+<li>辅助索引页被读取到缓冲池时，也就是常规 SELECT 使用了辅助索引时</li>
+<li>Insert Buffer Bitmap 页追踪到该辅助索引页已无可用空间时</li>
+<li>Master Thread 定期合并</li>
+</ul>
+<h4 id="change-buffer">change buffer</h4>
+<p>InnoDB 从1.0.x版本开始引入了 Change Buffer，可将其视为Insert Buffer 的升级。从这个版本开始，InnoDB存储引擎可以对 DML操作——INSERT、DELETE、UPDATE都进行缓冲，他们分别是: Insert Buffer、Delete Buffer、Purge buffer</p>
+<h3 id="doublewrite">Doublewrite</h3>
+<h4 id="partial-write">partial write</h4>
+<p>InnoDB 的 page size 默认是 16KB，而操作系统与物理磁盘的一个 block size 更小，这会导致在极端情况下 (断电 / os crash) 对磁盘的页写入只有部分成功，即无法确保页写入操作的原子性</p>
+<h4 id="实现-1">实现</h4>
+<p>doublewrite 是 Innodb 磁盘表空间内部分配的一片缓冲区，一般 double write 包含 128 个页，对于 pagesize 为 16k 的页，总共 2MB。Innodb 在磁盘写入时先将页写入 doublewrite 缓冲区，然后再将其从缓冲区写入真正的表内存储位置</p>
+<ul>
+<li>写 double write buffer 本身失败，那么这些数据不会被写到磁盘，InnoDB 此时会从磁盘载入原始的数据，然后通过 InnoDB 的事务日志来计算出正确的数据，重新写入到 double write buffer</li>
+<li>写 double write buffer 本身成功，写数据到磁盘失败，Innodb 存储引擎可以从共享表空间的 double write 中找到该页的副本，将其复制到表空间文件，再应用 redo log，就完成了恢复过程</li>
+</ul>
+<h4 id="redo-log-能否恢复">redo log 能否恢复</h4>
+<p>纯物理日志实现 redo log 完全不依赖物理页的状态，并且是幂等性的，因此可以恢复 partial write</p>
+<p>而 innoDB 的 redo 采用的是物理逻辑结合型的日志。物理到具体的哪个 page，页内操作是逻辑的。这种方式既实现了物理日志带来的幂等性（以物理页为整体），又拥有逻辑日志带来的轻量性（物理页内修改是逻辑日志）。所以物理页内修改不是幂等的，需要使用 doublewrite 技术来保证写入的成功</p>
+<h4 id="redo-log-是否需要保护">redo log 是否需要保护</h4>
+<p>redo 日志的页大小一般设计为 512 Byte，不会出现 partial write</p>
+<h4 id="others">others</h4>
+<ul>
+<li>向磁盘上的 doublewrite 缓冲区写入时是顺序写入，因此性能影响不大。缓冲区再向各表同步时还是随机写入的</li>
+<li>若文件系统本身支持原子性写入，确保不会发生 partial write 就可以关闭 double write 来避免无意义的性能损失</li>
+</ul>
+<h3 id="自适应哈希索引">自适应哈希索引</h3>
+<p>InnoDB 存储引擎会自动根据访问的频率和模式来自动地为某些热点页建立哈希索引，来提高查询效率。可以关闭该功能但不能强制启用哈希索引</p>
+<h4 id="自动启用条件">自动启用条件</h4>
+<ul>
+<li>连续查询的条件一样：例如不能交替查询 WHERE a=xxx 和 WHERE a=xxx and b=xxx</li>
+<li>连续用同样的模式访问100次</li>
+<li>页通过该模式访问了N次，其中N=页中记录*1/16 （没看懂）</li>
+</ul>
+<h3 id="异步io--刷新邻接页">异步IO / 刷新邻接页</h3>
+<p>常规特色也就是异步能避免 IO 阻塞线程；另一个优势是可以进行IO Merge操作，也就是将多个IO合并为1个IO，这样可以提高IOPS的性能</p>
+<p>当刷新一个脏页时，InnoDB存储引擎会检测该页所在区的所有页，如果是脏页，那么一起进行刷新。该工作机制在传统机械磁盘下有着显著的优势，但是</p>
+<ul>
+<li>可能将不怎么脏的页进行了写人，而该页之后又会很快变成脏页</li>
+<li>固态硬盘有着较高的IOPS</li>
+</ul>
+<p>因此对于固态硬盘建议不启用此特性</p>
+<h3 id="启动关闭与恢复">启动关闭与恢复</h3>
+<h4 id="innodb_fast-shutdown">innodb_fast shutdown</h4>
+<ul>
+<li>0表示在MySQL数据库关闭时，InnoDB需要完成所有的full purge和 mergeinsert buffer，并且将所有的脏页刷新回磁盘。这需要一些时间，有时甚至需要几个小时来完成。如果在进行InnoDB升级时，必须将这个参数调为0，然后再关闭数据库。</li>
+<li>1是参数innodb_fast_shutdown 的默认值，表示不需要完成上述的full purge和merge insert buffer操作，但是在缓冲池中的一些数据脏页还是会刷新回磁盘。2表示不完成full purge和 merge insert buffer操作，也不将缓冲池中的数据脏页写回磁盘，而是将日志都写入日志文件。这样不会有任何事务的丢失，但是下次MySQL数据库启动时，会进行恢复操作（recovery)。</li>
+<li>2表示不完成full purge和 merge insert buffer操作，也不将缓冲池中的数据脏页写回磁盘，而是将日志都写入日志文件。这样不会有任何事务的丢失，但是下次MySQL数据库启动时，会进行恢复操作（recovery)。</li>
+</ul>
+<h4 id="innodb_force_recovery">innodb_force_recovery</h4>
+<p>默认为0，可设置为1~6</p>
+<p>代表当发生需要恢复时，进行所有的恢复操作，当不能进行有效恢复时，如数据页发生了corruption，MySQL数据库可能发生宕机（crash)，并把错误写入错误日志中去</p>
+<h2 id="p3">P3</h2>
+<h3 id="mysql参数">mysql参数</h3>
+<ul>
+<li>static 静态变量：无法在实例生命周期内修改</li>
+<li>dynamic 动态参数：分为session级与global级</li>
+</ul>
+<h3 id="日志文件">日志文件</h3>
+<h4 id="error-log">error log</h4>
+<ul>
+<li>错误日志文件对MySQL的启动、运行、关闭过程进行了记录，也包含一些警告与正确的信息</li>
+<li>文件路径定位：SHOW VARIABLES LIKE&rsquo;log_error'</li>
+</ul>
+<h4 id="slow-log">slow log</h4>
+<p>可以在 MySQL启动时设一个阈值，将运行时间大于（不包含等于）该值的所有SQL语句都记录到慢查询日志文件中</p>
+<ul>
+<li>参数：long_query_time。默认值为10，代表10秒。</li>
+<li>参数：log_slow_queries，是否启用 slow log 。默认不开启，需要手动设为 ON</li>
+<li>参数：log_queries_not_using_indexes，是否启用检测未使用索引的语句</li>
+<li>参数：log_throttle_queries_not_using_indexes，表示每分钟允许记录到 slow log 的且未使用索引的SQL语句次数。默认为0，表示无限制。此参数作用是防止过于频繁触发未使用索引检测，导致 slow log 过快无意义增长</li>
+<li>mysqldumpslow 命令辅助分析慢查询日志</li>
+</ul>
+<p>InnoDB 额外统计了 SQL 执行中逻辑读取（包含物理读取与缓冲池读取）与物理读取的次数，观察它们的比例可以辅助判断是否需要优化</p>
+<h3 id="查询日志">查询日志</h3>
+<p>查询日志记录了所有对MySQL数据库请求的信息，无论这些请求是否得到了正确的执行。默认文件名为:主机名.log</p>
+<h3 id="bin-log">bin log</h3>
+<p>二进制日志记录了对 MySQL 数据厍执行更改的所有操作以及时间等信息，但是不包括 SELECT 和 SHOW 这类操作，因为这类操作对数据本身并没有修改</p>
+<ul>
+<li>若有 UPDATE 操作未对数据库产生变化，也会被记录在 bin log 中</li>
+</ul>
+<p>主要有以下作用：</p>
+<ul>
+<li>恢复（recovery）：某些数据的恢复需要二进制日志，例如在一个数据库全备文件恢复后，可以通过二进制日志进行 poing-in-time 的恢复</li>
+<li>复制（replication）：其原理与恢复类似，通过复制和执行二进制日志，使两台数据库实时同步</li>
+<li>审计（audit）：判断有无 sql 注入攻击</li>
+</ul>
+<h4 id="缓存">缓存</h4>
+<p>使用事务的引擎中，未提交的二进制日志会先写入缓存中（基于session）</p>
+<ul>
+<li>binlog_cache_size：决定该缓存的大小</li>
+<li>缓存超出限制大小时会创建临时文件</li>
+<li>binlog_cache_use、binlog_cache_disk_use分别代表使用缓存与使用临时文件缓存二进制日志的次数，观察这俩变量可以得知缓存限制是否过小</li>
+</ul>
+<h4 id="同步">同步</h4>
+<p>sync_binlog</p>
+<p>占坑</p>
+<h4 id="格式">格式</h4>
+<ul>
+<li>Statement：记录 SQL 语句</li>
+<li>Row：记录每一行变化的二进制原始数据</li>
+<li>MIXED：以上两种混合</li>
+</ul>
+<p>优劣：https://zhuanlan.zhihu.com/p/26977878</p>
+<h3 id="redo-log">redo log</h3>
+<ul>
+<li>二进制日志会记录所有与MySQL数据库有关的日志记录，包括InnoDB、MylSAM、Heap等其他存储引擎的日志。而InnoDB存储引擎的重做日志只记录有关该存储引擎本身的事务日志</li>
+<li>其次，记录的内容不同，无论用户将二进制日志文件记录的格式设为STATEMENT还是ROW，又或者是MIXED，其记录的都是关于一个事务的具体操作内容，即该日志是逻辑日志。而InnoDB存储引擎的重做日志文件记录的是关于每个页(Page）的更改的物理情况。</li>
+<li>此外，写入的时间也不同，二进制日志文件仅在事务提交前进行提交，即只写磁盘一次，不论这时该事务多大。而在事务进行的过程中，却不断有重做日志条目（redocntry）被写入到重做日志文件中。</li>
+</ul>
+<blockquote>
+<p>上面提过，redo log写入单位为512字节，能保证写入的原子性因此不需要 double write 机制保护</p>
+</blockquote>
+<p>具体还是等事务部分细说，占坑</p>
+<h2 id="p5-索引与算法">P5 索引与算法</h2>
+<h3 id="b-tree">B+ tree</h3>
+<ul>
+<li>InnoDB中一般为2-4层，以适应磁盘随机读取开销较大的特性，在查询时降低随机 IO 次数</li>
+</ul>
+<h4 id="插入">插入</h4>
+<p><figure 
+	>
+	<a href="http://pic.cosmos.red//image-20210823100442159.png" >
+		<img src="http://pic.cosmos.red//image-20210823100442159.png"
+			
+			
+			
+			loading="lazy"
+			alt="image-20210823100442159">
+	</a>
+	
+	<figcaption>image-20210823100442159</figcaption>
+	
+</figure></p>
+<p>以此图为例，插入70</p>
+<ul>
+<li>
+<p>拆分：<figure 
+	>
+	<a href="http://pic.cosmos.red//image-20210823100516595.png" >
+		<img src="http://pic.cosmos.red//image-20210823100516595.png"
+			
+			
+			
+			loading="lazy"
+			alt="image-20210823100516595">
+	</a>
+	
+	<figcaption>image-20210823100516595</figcaption>
+	
+</figure></p>
+</li>
+<li>
+<p>旋转：当左右兄弟节点未满时，优先使用旋转提高效率</p>
+<p><figure 
+	>
+	<a href="http://pic.cosmos.red//image-20210823100624552.png" >
+		<img src="http://pic.cosmos.red//image-20210823100624552.png"
+			
+			
+			
+			loading="lazy"
+			alt="image-20210823100624552">
+	</a>
+	
+	<figcaption>image-20210823100624552</figcaption>
+	
+</figure></p>
+</li>
+</ul>
+<h3 id="索引">索引</h3>
+<p>采用B+ 树结构，叶子节点由双向链表连接</p>
+<h4 id="创建索引">创建索引</h4>
+<p>ALTER TABLE tbl_name</p>
+<p>CREATE [UNIQUE] INDEX index_name [index_type] ON tbl_name</p>
+<h4 id="聚焦索引">聚焦索引</h4>
+<p>每张表仅有一个，以主键为索引，叶子节点（数据页）存放的是完整行数据</p>
+<h5 id="主键">主键</h5>
+<ul>
+<li>不可修改（？）：因为主键的第二个作用是让其他表的外键引用自己，从而实现关系结构。一旦某个表的主键发生了变化，就会导致所有引用了该表的数据必须全部修改外键。很多Web应用的数据库并不是强约束（仅仅引用主键但并没有设置外键约束），修改主键会导致数据完整性直接被破坏</li>
+<li>业务无关：为满足不可修改原则，主键不能与业务有关联</li>
+<li>不宜过大：辅助索引的值为主键，因为主键的大小会影响辅助索引大小</li>
+<li>推荐使用自增：因为innodb是B+ 树结构，自增主键导致新增行时是高性能的顺序写入，同时避免了B+ 树的拆分。也因此对范围查询拥有高性能</li>
+<li>自增主键也会遇到自增锁的性能问题</li>
+</ul>
+<h4 id="辅助索引非聚焦索引">辅助索引/非聚焦索引</h4>
+<p>叶子节点只存放主键，因此需要根据主键在聚焦索引里二次查询才能得到完整行内容，这个过程称为回表</p>
+<h4 id="联合索引">联合索引</h4>
+<p><figure 
+	>
+	<a href="http://pic.cosmos.red//image-20210824170734902.png" >
+		<img src="http://pic.cosmos.red//image-20210824170734902.png"
+			
+			
+			
+			loading="lazy"
+			alt="image-20210824170734902">
+	</a>
+	
+	<figcaption>image-20210824170734902</figcaption>
+	
+</figure></p>
+<p>对多个列组合起来的索引，如 (a,b) 索引将先按 a 再按 b 排序。因此针对 a 或者 a&amp;&amp;b 的条件查询都可以使用该索引，但是 b 条件不行，因为此联合索引没有按 b 的顺序</p>
+<p>也因为多列索引都以排序这个特性，可以免去部分范围查询的二次排序</p>
+<h4 id="覆盖索引">覆盖索引</h4>
+<p>当只在辅助索引（一般即为联合索引）中就能得到查询的记录时，即可省去回表这步</p>
+<p>使用统计（COUNT）时也会优先使用可行的联合索引，因为单节点小，同页节点多查询更快</p>
+<h4 id="fast-index-creation">Fast Index Creation</h4>
+<p>在5.5版本前，索引的添加或删除需要创建并导入原表数据到一张新表，因此需要宕机很长的时间</p>
+<p>5.5版本后有了 FIC 对创建索引的表加上 S 锁，不再需要创建新表因此速度大大提高，此技术仅适用于辅助索引。但这个过程中对表只能读不能写</p>
+<h4 id="cardinality">Cardinality</h4>
+<p>代表索引中不重复记录的比例，即索引的『选择性』。如性别列中只会有F,M两个选项，就只有50%的选择性</p>
+<p>当 Cardinality 值过低代表该索引低选择性，为其建立索引的意义较低</p>
+<p>Cardinality 的统计是由引擎层实现的。InnoDB 中 Cardinality 值是随机对8个叶子节点采样统计，因此表未改动的情况下该值也可能不同。统计 Cardinality 可能会产生较大的性能损耗，因此不应随意进行</p>
+<h4 id="mrr--multi-range-read">MRR / Multi-Range Read</h4>
+<p>在进行如范围查询这种需要批量回表操作的查询时，若不做任何优化则回表查询会是随机读取，而 MRR 的作用就是在回表前，对这一批查询根据主键进行排序再回表，这样回表就变成了较为顺序的读取，从而提高性能</p>
+<h4 id="icp--索引条件下推优化">ICP / 索引条件下推优化</h4>
+<p>开启 ICP 时，使用辅助索引进行条件查询，会在查询辅助索引的同时就判断是否可以进行 WHERE 条件的过滤，过滤掉已经不符合要求的行后再回表。未开启 ICP 则不会有这步过滤，而只会回表取出所有完整行数据再进行过滤。ICP 相当于辅助索引查询时，利用联合索引已经包含多个列信息的特点，提前进行可能的 WHERE 条件筛选，从而减少不必要的回表来提高性能</p>
+<ul>
+<li>适用于 InnoDB 和 MyISAM</li>
+<li>显然，只有联合索引才可能在查询时提前过滤</li>
+</ul>
+<blockquote>
+<p>启用 ICP 的情况下利用二级索引查找数据的过程为：</p>
+<ol>
+<li>用二级索引查找数据的主键；</li>
+<li>如果二级索引记录的元组里的列出现在 where 条件里，那么对元组进行过滤；</li>
+<li>对索引元组的主键回表读取完整的行记录；</li>
+<li>利用 where 语句的剩余条件对行记录进行过滤；</li>
+</ol>
+</blockquote>
+<h4 id="全文索引">全文索引</h4>
+<p>InnoDB 使用 full inverted index 形式的倒排索引，记录了每个单词出现在哪个文档以及在其中的位置</p>
+<p><figure 
+	>
+	<a href="http://pic.cosmos.red//image-20210825174421628.png" >
+		<img src="http://pic.cosmos.red//image-20210825174421628.png"
+			
+			
+			
+			loading="lazy"
+			alt="image-20210825174421628">
+	</a>
+	
+	<figcaption>image-20210825174421628</figcaption>
+	
+</figure></p>
+<p><figure 
+	>
+	<a href="http://pic.cosmos.red//image-20210825174429861.png" >
+		<img src="http://pic.cosmos.red//image-20210825174429861.png"
+			
+			
+			
+			loading="lazy"
+			alt="image-20210825174429861">
+	</a>
+	
+	<figcaption>image-20210825174429861</figcaption>
+	
+</figure></p>
+<h5 id="用法">用法&hellip;</h5>
+<h2 id="p6-锁">P6 锁</h2>
+<h3 id="lock--latch">lock / latch</h3>
+<p><figure 
+	>
+	<a href="http://pic.cosmos.red//image-20210825182952229.png" >
+		<img src="http://pic.cosmos.red//image-20210825182952229.png"
+			
+			
+			
+			loading="lazy"
+			alt="image-20210825182952229">
+	</a>
+	
+	<figcaption>image-20210825182952229</figcaption>
+	
+</figure></p>
+<h3 id="mvcc">MVCC</h3>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/innodb/">innodb</a>
+        
+            <a href="/tags/mysql/">mysql</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    <aside class="related-contents--wrapper">
+    
+    
+</aside>
+
+     
+     
+        
+    <div class="disqus-container">
+    <div id="disqus_thread"></div>
+<script type="application/javascript">
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "hugo-theme-stack" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+
+<style>
+    .disqus-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+    }
+</style>
+
+<script>
+    window.addEventListener('onColorSchemeChange', (e) => {
+        if (DISQUS) {
+            DISQUS.reset({
+                reload: true
+            });
+        }
+    })
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2020 - 
+        
+        2021 M-Cosmosss
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.2.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer="true"
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer="true"
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.css"integrity="sha256-c0uckgykQ9v5k&#43;IqViZOZKc47Jn7KQil4/MP3ySA3F8="crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.css"integrity="sha256-SBLU4vv6CA6lHsZ1XyTdhyjJxCjPif/TRkjnsyGAGnE="crossorigin="anonymous"
+            >
+
+            </main>
+    
+        <aside class="sidebar right-sidebar sticky">
+            <section class="widget archives">
+                <div class="widget-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+                </div>
+                <h2 class="widget-title section-title">Table of contents</h2>
+                
+                <div class="widget--toc">
+                    <nav id="TableOfContents">
+  <ol>
+    <li><a href="#p2">P2</a>
+      <ol>
+        <li><a href="#threads">Threads</a>
+          <ol>
+            <li><a href="#master-thread">Master Thread</a></li>
+            <li><a href="#io-thread">IO Thread</a></li>
+            <li><a href="#purge-thread">Purge Thread</a></li>
+            <li><a href="#page-cleaner-thread">Page Cleaner Thread</a></li>
+          </ol>
+        </li>
+        <li><a href="#缓冲池">缓冲池</a>
+          <ol>
+            <li><a href="#页类型">页类型</a></li>
+            <li><a href="#innodb_buffer_pool_instances">innodb_buffer_pool_instances</a></li>
+          </ol>
+        </li>
+        <li><a href="#池内存管理">池内存管理</a>
+          <ol>
+            <li><a href="#改动过的-lru-算法">改动过的 LRU 算法</a></li>
+            <li><a href="#缓冲命中率">缓冲命中率</a></li>
+          </ol>
+        </li>
+        <li><a href="#checkpoint">Checkpoint</a>
+          <ol>
+            <li><a href="#sharp-checkpoint">Sharp Checkpoint</a></li>
+            <li><a href="#fuzzy-checkpointin">Fuzzy checkpointin</a></li>
+          </ol>
+        </li>
+        <li><a href="#插入缓冲-insert-buffer">插入缓冲 Insert Buffer</a>
+          <ol>
+            <li><a href="#实现">实现</a></li>
+            <li><a href="#使用条件">使用条件</a></li>
+            <li><a href="#merge-场合">Merge 场合</a></li>
+            <li><a href="#change-buffer">change buffer</a></li>
+          </ol>
+        </li>
+        <li><a href="#doublewrite">Doublewrite</a>
+          <ol>
+            <li><a href="#partial-write">partial write</a></li>
+            <li><a href="#实现-1">实现</a></li>
+            <li><a href="#redo-log-能否恢复">redo log 能否恢复</a></li>
+            <li><a href="#redo-log-是否需要保护">redo log 是否需要保护</a></li>
+            <li><a href="#others">others</a></li>
+          </ol>
+        </li>
+        <li><a href="#自适应哈希索引">自适应哈希索引</a>
+          <ol>
+            <li><a href="#自动启用条件">自动启用条件</a></li>
+          </ol>
+        </li>
+        <li><a href="#异步io--刷新邻接页">异步IO / 刷新邻接页</a></li>
+        <li><a href="#启动关闭与恢复">启动关闭与恢复</a>
+          <ol>
+            <li><a href="#innodb_fast-shutdown">innodb_fast shutdown</a></li>
+            <li><a href="#innodb_force_recovery">innodb_force_recovery</a></li>
+          </ol>
+        </li>
+      </ol>
+    </li>
+    <li><a href="#p3">P3</a>
+      <ol>
+        <li><a href="#mysql参数">mysql参数</a></li>
+        <li><a href="#日志文件">日志文件</a>
+          <ol>
+            <li><a href="#error-log">error log</a></li>
+            <li><a href="#slow-log">slow log</a></li>
+          </ol>
+        </li>
+        <li><a href="#查询日志">查询日志</a></li>
+        <li><a href="#bin-log">bin log</a>
+          <ol>
+            <li><a href="#缓存">缓存</a></li>
+            <li><a href="#同步">同步</a></li>
+            <li><a href="#格式">格式</a></li>
+          </ol>
+        </li>
+        <li><a href="#redo-log">redo log</a></li>
+      </ol>
+    </li>
+    <li><a href="#p5-索引与算法">P5 索引与算法</a>
+      <ol>
+        <li><a href="#b-tree">B+ tree</a>
+          <ol>
+            <li><a href="#插入">插入</a></li>
+          </ol>
+        </li>
+        <li><a href="#索引">索引</a>
+          <ol>
+            <li><a href="#创建索引">创建索引</a></li>
+            <li><a href="#聚焦索引">聚焦索引</a></li>
+            <li><a href="#辅助索引非聚焦索引">辅助索引/非聚焦索引</a></li>
+            <li><a href="#联合索引">联合索引</a></li>
+            <li><a href="#覆盖索引">覆盖索引</a></li>
+            <li><a href="#fast-index-creation">Fast Index Creation</a></li>
+            <li><a href="#cardinality">Cardinality</a></li>
+            <li><a href="#mrr--multi-range-read">MRR / Multi-Range Read</a></li>
+            <li><a href="#icp--索引条件下推优化">ICP / 索引条件下推优化</a></li>
+            <li><a href="#全文索引">全文索引</a></li>
+          </ol>
+        </li>
+      </ol>
+    </li>
+    <li><a href="#p6-锁">P6 锁</a>
+      <ol>
+        <li><a href="#lock--latch">lock / latch</a></li>
+        <li><a href="#mvcc">MVCC</a></li>
+      </ol>
+    </li>
+  </ol>
+</nav>
+                </div>
+            </section>
+        </aside>
+    
+
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.5/dist/vibrant.min.js"integrity="sha256-5NovOZc4iwiAWTYIFiIM7DxKUXKWvpVEuMEPLzcm5/g="crossorigin="anonymous"
+                defer="false"
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>
