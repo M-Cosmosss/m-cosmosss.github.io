@@ -328,47 +328,22 @@
      
      
         
-    <script src="https://utteranc.es/client.js" 
-        repo="M-Cosmosss/blogtalk"
-        issue-term="pathname"
-        
-        label="comments"
-        
-        crossorigin="anonymous"
-        async
-        >
-</script>
-
+    <script src='//cdn.jsdelivr.net/npm/@waline/client/dist/Waline.min.js'></script>
+<div id="waline" class="waline-container"></div>
 <style>
-    .utterances {
-        max-width: unset;
+    .waline-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
     }
-</style>
-
-<script>
-    function setUtterancesTheme(theme) {
-        let utterances = document.querySelector('.utterances iframe');
-        if (utterances) {
-            utterances.contentWindow.postMessage(
-                {
-                    type: 'set-theme',
-                    theme: `github-${theme}`
-                },
-                'https://utteranc.es'
-            );
-        }
+    .waline-container .vcount {
+        color: var(--card-text-color-main);
     }
-
-    addEventListener('message', event => {
-        if (event.origin !== 'https://utteranc.es') return;
-        setUtterancesTheme(document.documentElement.dataset.scheme)
-    });
-
-    window.addEventListener('onColorSchemeChange', (e) => {
-        setUtterancesTheme(e.detail)
-    })
+</style><script>
+    
+    new Waline({"dark":"html[data-scheme=\"dark\"]","el":"#waline","emoji":["https://cdn.jsdelivr.net/gh/walinejs/emojis/weibo","https://cdn.jsdelivr.net/gh/walinejs/emojis@1.0.0/bilibili","https://cdn.jsdelivr.net/gh/walinejs/emojis@1.0.0/tieba","https://cdn.jsdelivr.net/gh/walinejs/emojis@1.0.0/alus"],"locale":{"admin":"Admin"},"placeholder":"Now Loading...","requiredMeta":["name","email","url"],"serverURL":"https://blog-waline-6vv6iesxo-m-cosmosss.vercel.app/","visitor":true});
 </script>
-
 
     
 

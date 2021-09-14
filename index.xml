@@ -22,7 +22,6 @@
         
         <guid>https://cosmos.red/p/mysql-%E6%8A%80%E6%9C%AF%E5%86%85%E5%B9%95%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/</guid>
         <description>&lt;img src="https://cosmos.red/p/mysql-%E6%8A%80%E6%9C%AF%E5%86%85%E5%B9%95%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/b.jpg" alt="Featured image of post 《Mysql 技术内幕》阅读笔记" /&gt;&lt;h1 id=&#34;mysql&#34;&gt;Mysql&lt;/h1&gt;
-&lt;p&gt;[TOC]&lt;/p&gt;
 &lt;h2 id=&#34;p2&#34;&gt;P2&lt;/h2&gt;
 &lt;h3 id=&#34;threads&#34;&gt;Threads&lt;/h3&gt;
 &lt;h4 id=&#34;master-thread&#34;&gt;Master Thread&lt;/h4&gt;
@@ -53,10 +52,8 @@
 			
 			
 			loading=&#34;lazy&#34;
-			alt=&#34;image-20210717031742053&#34;&gt;
+			&gt;
 	&lt;/a&gt;
-	
-	&lt;figcaption&gt;image-20210717031742053&lt;/figcaption&gt;
 	
 &lt;/figure&gt;&lt;/p&gt;
 &lt;h4 id=&#34;innodb_buffer_pool_instances&#34;&gt;innodb_buffer_pool_instances&lt;/h4&gt;
@@ -76,10 +73,8 @@
 			
 			
 			loading=&#34;lazy&#34;
-			alt=&#34;image-20210719035257307&#34;&gt;
+			&gt;
 	&lt;/a&gt;
-	
-	&lt;figcaption&gt;image-20210719035257307&lt;/figcaption&gt;
 	
 &lt;/figure&gt;&lt;/p&gt;
 &lt;h3 id=&#34;checkpoint&#34;&gt;Checkpoint&lt;/h3&gt;
@@ -263,10 +258,8 @@
 			
 			
 			loading=&#34;lazy&#34;
-			alt=&#34;image-20210823100442159&#34;&gt;
+			&gt;
 	&lt;/a&gt;
-	
-	&lt;figcaption&gt;image-20210823100442159&lt;/figcaption&gt;
 	
 &lt;/figure&gt;&lt;/p&gt;
 &lt;p&gt;以此图为例，插入70&lt;/p&gt;
@@ -280,10 +273,8 @@
 			
 			
 			loading=&#34;lazy&#34;
-			alt=&#34;image-20210823100516595&#34;&gt;
+			&gt;
 	&lt;/a&gt;
-	
-	&lt;figcaption&gt;image-20210823100516595&lt;/figcaption&gt;
 	
 &lt;/figure&gt;&lt;/p&gt;
 &lt;/li&gt;
@@ -297,10 +288,8 @@
 			
 			
 			loading=&#34;lazy&#34;
-			alt=&#34;image-20210823100624552&#34;&gt;
+			&gt;
 	&lt;/a&gt;
-	
-	&lt;figcaption&gt;image-20210823100624552&lt;/figcaption&gt;
 	
 &lt;/figure&gt;&lt;/p&gt;
 &lt;/li&gt;
@@ -331,10 +320,8 @@
 			
 			
 			loading=&#34;lazy&#34;
-			alt=&#34;image-20210824170734902&#34;&gt;
+			&gt;
 	&lt;/a&gt;
-	
-	&lt;figcaption&gt;image-20210824170734902&lt;/figcaption&gt;
 	
 &lt;/figure&gt;&lt;/p&gt;
 &lt;p&gt;对多个列组合起来的索引，如 (a,b) 索引将先按 a 再按 b 排序。因此针对 a 或者 a&amp;amp;&amp;amp;b 的条件查询都可以使用该索引，但是 b 条件不行，因为此联合索引没有按 b 的顺序&lt;/p&gt;
@@ -376,10 +363,8 @@
 			
 			
 			loading=&#34;lazy&#34;
-			alt=&#34;image-20210825174421628&#34;&gt;
+			&gt;
 	&lt;/a&gt;
-	
-	&lt;figcaption&gt;image-20210825174421628&lt;/figcaption&gt;
 	
 &lt;/figure&gt;&lt;/p&gt;
 &lt;p&gt;&lt;figure 
@@ -390,10 +375,8 @@
 			
 			
 			loading=&#34;lazy&#34;
-			alt=&#34;image-20210825174429861&#34;&gt;
+			&gt;
 	&lt;/a&gt;
-	
-	&lt;figcaption&gt;image-20210825174429861&lt;/figcaption&gt;
 	
 &lt;/figure&gt;&lt;/p&gt;
 &lt;h5 id=&#34;用法&#34;&gt;用法&amp;hellip;&lt;/h5&gt;
@@ -407,10 +390,8 @@
 			
 			
 			loading=&#34;lazy&#34;
-			alt=&#34;image-20210825182952229&#34;&gt;
+			&gt;
 	&lt;/a&gt;
-	
-	&lt;figcaption&gt;image-20210825182952229&lt;/figcaption&gt;
 	
 &lt;/figure&gt;&lt;/p&gt;
 &lt;h3 id=&#34;基本锁&#34;&gt;基本锁&lt;/h3&gt;

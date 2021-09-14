@@ -201,8 +201,8 @@
     <header class="article-header">
         <div class="article-image">
             <a href="/p/hello-world/">
-                <img src="/p/hello-world/a_huab728b81c765eac855365ed7f0704fc8_5908839_800x0_resize_box_2.png"
-                        srcset="/p/hello-world/a_huab728b81c765eac855365ed7f0704fc8_5908839_800x0_resize_box_2.png 800w, /p/hello-world/a_huab728b81c765eac855365ed7f0704fc8_5908839_1600x0_resize_box_2.png 1600w"
+                <img src="/p/hello-world/a_hu273edcfa61bb55b8582106cc102d4fe0_8043665_800x0_resize_box_2.png"
+                        srcset="/p/hello-world/a_hu273edcfa61bb55b8582106cc102d4fe0_8043665_800x0_resize_box_2.png 800w, /p/hello-world/a_hu273edcfa61bb55b8582106cc102d4fe0_8043665_1600x0_resize_box_2.png 1600w"
                         width="800" 
                         height="450" 
                         loading="lazy"
@@ -297,47 +297,22 @@
      
      
         
-    <script src="https://utteranc.es/client.js" 
-        repo="M-Cosmosss/blogtalk"
-        issue-term="pathname"
-        
-        label="comments"
-        
-        crossorigin="anonymous"
-        async
-        >
-</script>
-
+    <script src='//cdn.jsdelivr.net/npm/@waline/client/dist/Waline.min.js'></script>
+<div id="waline" class="waline-container"></div>
 <style>
-    .utterances {
-        max-width: unset;
+    .waline-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
     }
-</style>
-
-<script>
-    function setUtterancesTheme(theme) {
-        let utterances = document.querySelector('.utterances iframe');
-        if (utterances) {
-            utterances.contentWindow.postMessage(
-                {
-                    type: 'set-theme',
-                    theme: `github-${theme}`
-                },
-                'https://utteranc.es'
-            );
-        }
+    .waline-container .vcount {
+        color: var(--card-text-color-main);
     }
-
-    addEventListener('message', event => {
-        if (event.origin !== 'https://utteranc.es') return;
-        setUtterancesTheme(document.documentElement.dataset.scheme)
-    });
-
-    window.addEventListener('onColorSchemeChange', (e) => {
-        setUtterancesTheme(e.detail)
-    })
+</style><script>
+    
+    new Waline({"dark":"html[data-scheme=\"dark\"]","el":"#waline","emoji":["https://cdn.jsdelivr.net/gh/walinejs/emojis/weibo","https://cdn.jsdelivr.net/gh/walinejs/emojis@1.0.0/bilibili","https://cdn.jsdelivr.net/gh/walinejs/emojis@1.0.0/tieba","https://cdn.jsdelivr.net/gh/walinejs/emojis@1.0.0/alus"],"locale":{"admin":"Admin"},"placeholder":"Now Loading...","requiredMeta":["name","email","url"],"serverURL":"https://blog-waline-6vv6iesxo-m-cosmosss.vercel.app/","visitor":true});
 </script>
-
 
     
 

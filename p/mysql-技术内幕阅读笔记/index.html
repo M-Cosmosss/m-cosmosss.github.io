@@ -122,7 +122,6 @@
 
     <section class="article-content">
     <h1 id="mysql">Mysql</h1>
-<p>[TOC]</p>
 <h2 id="p2">P2</h2>
 <h3 id="threads">Threads</h3>
 <h4 id="master-thread">Master Thread</h4>
@@ -153,10 +152,8 @@
 			
 			
 			loading="lazy"
-			alt="image-20210717031742053">
+			>
 	</a>
-	
-	<figcaption>image-20210717031742053</figcaption>
 	
 </figure></p>
 <h4 id="innodb_buffer_pool_instances">innodb_buffer_pool_instances</h4>
@@ -176,10 +173,8 @@
 			
 			
 			loading="lazy"
-			alt="image-20210719035257307">
+			>
 	</a>
-	
-	<figcaption>image-20210719035257307</figcaption>
 	
 </figure></p>
 <h3 id="checkpoint">Checkpoint</h3>
@@ -363,10 +358,8 @@
 			
 			
 			loading="lazy"
-			alt="image-20210823100442159">
+			>
 	</a>
-	
-	<figcaption>image-20210823100442159</figcaption>
 	
 </figure></p>
 <p>以此图为例，插入70</p>
@@ -380,10 +373,8 @@
 			
 			
 			loading="lazy"
-			alt="image-20210823100516595">
+			>
 	</a>
-	
-	<figcaption>image-20210823100516595</figcaption>
 	
 </figure></p>
 </li>
@@ -397,10 +388,8 @@
 			
 			
 			loading="lazy"
-			alt="image-20210823100624552">
+			>
 	</a>
-	
-	<figcaption>image-20210823100624552</figcaption>
 	
 </figure></p>
 </li>
@@ -431,10 +420,8 @@
 			
 			
 			loading="lazy"
-			alt="image-20210824170734902">
+			>
 	</a>
-	
-	<figcaption>image-20210824170734902</figcaption>
 	
 </figure></p>
 <p>对多个列组合起来的索引，如 (a,b) 索引将先按 a 再按 b 排序。因此针对 a 或者 a&amp;&amp;b 的条件查询都可以使用该索引，但是 b 条件不行，因为此联合索引没有按 b 的顺序</p>
@@ -476,10 +463,8 @@
 			
 			
 			loading="lazy"
-			alt="image-20210825174421628">
+			>
 	</a>
-	
-	<figcaption>image-20210825174421628</figcaption>
 	
 </figure></p>
 <p><figure 
@@ -490,10 +475,8 @@
 			
 			
 			loading="lazy"
-			alt="image-20210825174429861">
+			>
 	</a>
-	
-	<figcaption>image-20210825174429861</figcaption>
 	
 </figure></p>
 <h5 id="用法">用法&hellip;</h5>
@@ -507,10 +490,8 @@
 			
 			
 			loading="lazy"
-			alt="image-20210825182952229">
+			>
 	</a>
-	
-	<figcaption>image-20210825182952229</figcaption>
 	
 </figure></p>
 <h3 id="基本锁">基本锁</h3>
@@ -658,47 +639,22 @@
      
      
         
-    <script src="https://utteranc.es/client.js" 
-        repo="M-Cosmosss/blogtalk"
-        issue-term="pathname"
-        
-        label="comments"
-        
-        crossorigin="anonymous"
-        async
-        >
-</script>
-
+    <script src='//cdn.jsdelivr.net/npm/@waline/client/dist/Waline.min.js'></script>
+<div id="waline" class="waline-container"></div>
 <style>
-    .utterances {
-        max-width: unset;
+    .waline-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
     }
-</style>
-
-<script>
-    function setUtterancesTheme(theme) {
-        let utterances = document.querySelector('.utterances iframe');
-        if (utterances) {
-            utterances.contentWindow.postMessage(
-                {
-                    type: 'set-theme',
-                    theme: `github-${theme}`
-                },
-                'https://utteranc.es'
-            );
-        }
+    .waline-container .vcount {
+        color: var(--card-text-color-main);
     }
-
-    addEventListener('message', event => {
-        if (event.origin !== 'https://utteranc.es') return;
-        setUtterancesTheme(document.documentElement.dataset.scheme)
-    });
-
-    window.addEventListener('onColorSchemeChange', (e) => {
-        setUtterancesTheme(e.detail)
-    })
+</style><script>
+    
+    new Waline({"dark":"html[data-scheme=\"dark\"]","el":"#waline","emoji":["https://cdn.jsdelivr.net/gh/walinejs/emojis/weibo","https://cdn.jsdelivr.net/gh/walinejs/emojis@1.0.0/bilibili","https://cdn.jsdelivr.net/gh/walinejs/emojis@1.0.0/tieba","https://cdn.jsdelivr.net/gh/walinejs/emojis@1.0.0/alus"],"locale":{"admin":"Admin"},"placeholder":"Now Loading...","requiredMeta":["name","email","url"],"serverURL":"https://blog-waline-6vv6iesxo-m-cosmosss.vercel.app/","visitor":true});
 </script>
-
 
     
 
