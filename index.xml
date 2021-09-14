@@ -6,13 +6,23 @@
         <description>Recent content on M-Cosmosss</description>
         <generator>Hugo -- gohugo.io</generator>
         <language>en-us</language>
-        <lastBuildDate>Wed, 25 Aug 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://cosmos.red/index.xml" rel="self" type="application/rss+xml" /><item>
-        <title>InnoDB</title>
-        <link>https://cosmos.red/p/mysql/</link>
+        <lastBuildDate>Mon, 13 Sep 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://cosmos.red/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>Innodb 是如何在 RR 中解决幻读的</title>
+        <link>https://cosmos.red/p/innodb-%E6%98%AF%E5%A6%82%E4%BD%95%E5%9C%A8-rr-%E4%B8%AD%E8%A7%A3%E5%86%B3%E5%B9%BB%E8%AF%BB%E7%9A%84/</link>
+        <pubDate>Mon, 13 Sep 2021 00:00:00 +0000</pubDate>
+        
+        <guid>https://cosmos.red/p/innodb-%E6%98%AF%E5%A6%82%E4%BD%95%E5%9C%A8-rr-%E4%B8%AD%E8%A7%A3%E5%86%B3%E5%B9%BB%E8%AF%BB%E7%9A%84/</guid>
+        <description>&lt;img src="https://cosmos.red/p/innodb-%E6%98%AF%E5%A6%82%E4%BD%95%E5%9C%A8-rr-%E4%B8%AD%E8%A7%A3%E5%86%B3%E5%B9%BB%E8%AF%BB%E7%9A%84/c.jpg" alt="Featured image of post Innodb 是如何在 RR 中解决幻读的" /&gt;&lt;p&gt;开坑待填&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>《Mysql 技术内幕》阅读笔记</title>
+        <link>https://cosmos.red/p/mysql-%E6%8A%80%E6%9C%AF%E5%86%85%E5%B9%95%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/</link>
         <pubDate>Wed, 25 Aug 2021 00:00:00 +0000</pubDate>
         
-        <guid>https://cosmos.red/p/mysql/</guid>
-        <description>&lt;img src="https://cosmos.red/p/mysql/b.jpg" alt="Featured image of post InnoDB" /&gt;&lt;h1 id=&#34;mysql&#34;&gt;Mysql&lt;/h1&gt;
+        <guid>https://cosmos.red/p/mysql-%E6%8A%80%E6%9C%AF%E5%86%85%E5%B9%95%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/</guid>
+        <description>&lt;img src="https://cosmos.red/p/mysql-%E6%8A%80%E6%9C%AF%E5%86%85%E5%B9%95%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/b.jpg" alt="Featured image of post 《Mysql 技术内幕》阅读笔记" /&gt;&lt;h1 id=&#34;mysql&#34;&gt;Mysql&lt;/h1&gt;
+&lt;p&gt;[TOC]&lt;/p&gt;
 &lt;h2 id=&#34;p2&#34;&gt;P2&lt;/h2&gt;
 &lt;h3 id=&#34;threads&#34;&gt;Threads&lt;/h3&gt;
 &lt;h4 id=&#34;master-thread&#34;&gt;Master Thread&lt;/h4&gt;
@@ -198,11 +208,12 @@
 &lt;p&gt;占坑&lt;/p&gt;
 &lt;h4 id=&#34;格式&#34;&gt;格式&lt;/h4&gt;
 &lt;ul&gt;
-&lt;li&gt;Statement：记录 SQL 语句&lt;/li&gt;
-&lt;li&gt;Row：记录每一行变化的二进制原始数据&lt;/li&gt;
+&lt;li&gt;Statement-based：记录 SQL 语句。容量小，恢复数据快，具有可读性；但存在一些无法确保恢复数据一致的情景，不能使用该模式&lt;/li&gt;
+&lt;li&gt;Row-based：记录每一行变化的二进制原始数据。安全性高，需要更少的锁因此性能更好；容量更大&lt;/li&gt;
 &lt;li&gt;MIXED：以上两种混合&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;优劣：https://zhuanlan.zhihu.com/p/26977878&lt;/p&gt;
+&lt;p&gt;详细：&lt;a class=&#34;link&#34; href=&#34;https://zhuanlan.zhihu.com/p/26977878&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;MySQL binlog 日志的格式&lt;/a&gt;&lt;/p&gt;
 &lt;h3 id=&#34;redo-log&#34;&gt;redo log&lt;/h3&gt;
 &lt;ul&gt;
 &lt;li&gt;二进制日志会记录所有与MySQL数据库有关的日志记录，包括InnoDB、MylSAM、Heap等其他存储引擎的日志。而InnoDB存储引擎的重做日志只记录有关该存储引擎本身的事务日志&lt;/li&gt;
@@ -213,6 +224,31 @@
 &lt;p&gt;上面提过，redo log写入单位为512字节，能保证写入的原子性因此不需要 double write 机制保护&lt;/p&gt;
 &lt;/blockquote&gt;
 &lt;p&gt;具体还是等事务部分细说，占坑&lt;/p&gt;
+&lt;h2 id=&#34;p4-表&#34;&gt;P4 表&lt;/h2&gt;
+&lt;h3 id=&#34;外键约束&#34;&gt;外键约束&lt;/h3&gt;
+&lt;p&gt;外键 (FOREIGN KEY) 用于建立两个表数据中列的链接，从而维护数据一致性。被引用的表称为为父表，引用的表为子表，通常子表引用父表的主键建立约束：子表的外键指向父表主键&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;默认引擎不支持外键&lt;/li&gt;
+&lt;li&gt;外键与其指向的主键类型必须相同&lt;/li&gt;
+&lt;li&gt;子表插入一行时，若父表的主键中不存在与该行外键一致的值则不能插入&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;外键约束有四种子表操作来实现数据一致性：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;CASCADE (级联)：父表更新或删除一行时，子表中外键与其主键一致的所有行也更新或删除&lt;/li&gt;
+&lt;li&gt;RESTRICT (约束)：父表更新或删除一行时，如果子表中存在外键与其主键一致的行，则不允许并报错&lt;/li&gt;
+&lt;li&gt;SET NULL：父表更新或删除一行时，子表中外键与其主键一致的所有行将外键设为 NULL（该列需要允许为 NULL）&lt;/li&gt;
+&lt;li&gt;NO ACTION：与 RESTRICT 一致&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;外键约束对于确保数据一致性有着很好的作用，但是对性能有显著影响。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;不使用外键牺牲了数据库中数据的一致性，但是却能够减少数据库的负载；&lt;/li&gt;
+&lt;li&gt;模拟外键将一部分工作移到了数据库之外，我们可能需要放弃一部分一致性以获得更高的可用性，但是为了这部分可用性，我们会付出更多的研发与维护成本，也增加了与数据库之间的网络通信次数；&lt;/li&gt;
+&lt;li&gt;使用外键保证了数据库中数据的一致性，也将全部的计算任务全部交给了数据库&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;转自：&lt;a class=&#34;link&#34; href=&#34;https://draveness.me/whys-the-design-database-foreign-key/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;为什么数据库不应该使用外键&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
 &lt;h2 id=&#34;p5-索引与算法&#34;&gt;P5 索引与算法&lt;/h2&gt;
 &lt;h3 id=&#34;b-tree&#34;&gt;B+ tree&lt;/h3&gt;
 &lt;ul&gt;
@@ -377,7 +413,81 @@
 	&lt;figcaption&gt;image-20210825182952229&lt;/figcaption&gt;
 	
 &lt;/figure&gt;&lt;/p&gt;
-&lt;h3 id=&#34;mvcc&#34;&gt;MVCC&lt;/h3&gt;
+&lt;h3 id=&#34;基本锁&#34;&gt;基本锁&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;共享锁 (S Lock)：允许事务读&lt;/li&gt;
+&lt;li&gt;排他锁 (X Lock)：允许事务删除或更新&lt;/li&gt;
+&lt;li&gt;这里的锁粒度在行级&lt;/li&gt;
+&lt;li&gt;在申请行锁时，需要先申请表锁（意向锁）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;查询操作使用了索引时申请的是行锁，而查询没有索引的列只能全表扫描，因此只能升级为表锁&lt;/p&gt;
+&lt;h3 id=&#34;意向锁&#34;&gt;意向锁&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;分为 意向共享锁 (IS Lock) 和 意向排他锁 (IX Lock)&lt;/li&gt;
+&lt;li&gt;意向锁的粒度是表级，其他与基本锁一致&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;作用在于提高锁的效率：&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;当向一个表添加表级 X 锁的时候&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;如果没有意向锁的话，则需要遍历所有整个表判断是否有行锁的存在，以免发生冲突&lt;/li&gt;
+&lt;li&gt;如果有了意向锁，只需要判断该意向锁与即将添加的表级锁是否兼容即可。因为意向锁的存在代表了，有行级锁的存在或者即将有行级锁的存在。因而无需遍历整个表，即可获取结果&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;转自：&lt;a class=&#34;link&#34; href=&#34;https://www.zhihu.com/question/51513268/answer/147733422&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;知乎：InnoDB 的意向锁有什么作用？&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3 id=&#34;一致性锁定--非锁定读&#34;&gt;一致性锁定 / 非锁定读&lt;/h3&gt;
+&lt;p&gt;一致性非锁定读：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;通过 MVCC （多版本并发控制）为数据建立多版本快照，当读取的行有 X 锁时，会读取快照中的历史数据&lt;/li&gt;
+&lt;li&gt;基于 undo log 实现，因此本身不会有额外的开销&lt;/li&gt;
+&lt;li&gt;因为快照中的都是历史数据不会被修改，因此不需要上锁，从而大大提高并发性能&lt;/li&gt;
+&lt;li&gt;是否启用要看事务隔离级别&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;具体还是在 MVCC 部分讲&lt;/p&gt;
+&lt;p&gt;一致性锁定读：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;某些情况需要显式地对读取操作加锁来保证数据一致性&lt;/li&gt;
+&lt;li&gt;SELECT&amp;hellip;FOR UPDATE：对读取的行加上 X 锁&lt;/li&gt;
+&lt;li&gt;SELECT&amp;hellip;LOCK IN SHARE MODE：对读取行加 S 锁&lt;/li&gt;
+&lt;li&gt;必须在事务中才生效&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;自增锁&#34;&gt;自增锁&lt;/h3&gt;
+&lt;p&gt;对含有自增属性的表进行插入操作时，为了解决并发问题而存在的特殊表锁&lt;/p&gt;
+&lt;p&gt;根据参数 innodb_autoinc_lock_mode 共有三种运作模式&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;传统模式：向包含了自增属性列的表中插入数据时，获得 AUTO-INC 自增锁，在语句执行结束后释放，而不需要等到事务结束。确保自增列是顺序的，但同时只能执行一条插入语句&lt;/li&gt;
+&lt;li&gt;连续模式：如果插入语句能够提前确定插入的数据量，就不使用自增锁（也有说是立刻获取再释放），而是使用更轻量的互斥锁完成自增操作，不必等待 sql 语句执行完才能进行下一次插入&lt;/li&gt;
+&lt;li&gt;交叉模式：所有插入都不使用自增锁，而是轻量互斥锁，从而可以近似并发地执行。但因此相同自增值并不连续，因为 &lt;code&gt;AUTO_INCREMENT&lt;/code&gt; 的值分配会在多个 &lt;code&gt;INSERT&lt;/code&gt; 语句中来回交叉的执行，在并发的情况下无法保证数据一致性&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;因为交叉模式的特性，当 bin log 格式为 statement 时，由于其记录的是 sql 语句，在主从同步时无法确保数据一致。所以当使用交叉模式时，要么设置为 row 格式，要么确保自己永远不会用到 bin log&lt;/p&gt;
+&lt;h3 id=&#34;外键的锁&#34;&gt;外键的锁&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Innodb 会自动给外键列建立索引，从而避免外键约束检查时用到表锁&lt;/li&gt;
+&lt;li&gt;外键值的插入或更新需要查询父表，不使用一致性非锁定读，而是申请 S 锁来避免数据不一致&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;行锁记录锁间隙锁临键锁&#34;&gt;行锁：记录锁、间隙锁、临键锁&lt;/h3&gt;
+&lt;h4 id=&#34;记录锁-record-lock&#34;&gt;记录锁 Record Lock&lt;/h4&gt;
+&lt;p&gt;单行记录的锁&lt;/p&gt;
+&lt;h4 id=&#34;间隙锁-gap-lock&#34;&gt;间隙锁 Gap Lock&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;对索引的一个范围内锁定&lt;/li&gt;
+&lt;li&gt;范围两边都是开区间，如 between 10 and 20 锁定范围是(10，20)&lt;/li&gt;
+&lt;li&gt;只在 RR 可重复读隔离级别有效&lt;/li&gt;
+&lt;li&gt;间隙锁之间不存在冲突关系，只用于阻止在锁定的范围内插入&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;丁奇老师的总结&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;原则 1：加锁的基本单位是 next-key lock&lt;/p&gt;
+&lt;p&gt;原则 2：查找过程中访问到的对象才会加锁&lt;/p&gt;
+&lt;p&gt;优化 1：索引上的等值查询，给唯一索引加锁的时候，next-key lock 退化为行锁&lt;/p&gt;
+&lt;p&gt;优化 2：索引上的等值查询，向右遍历时且最后一个值不满足等值条件的时候，next-key lock 退化为间隙锁&lt;/p&gt;
+&lt;p&gt;一个 bug：唯一索引上的范围查询会访问到不满足条件的第一个值为止&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h4 id=&#34;临键锁-next-key-lock&#34;&gt;临键锁 Next-Key Lock&lt;/h4&gt;
+&lt;p&gt;结合了记录锁与间隙锁而成，锁定范围为&lt;strong&gt;左开右闭&lt;/strong&gt;区间内的索引&lt;/p&gt;
+&lt;h4 id=&#34;临键锁如何解决幻读&#34;&gt;临键锁如何解决幻读&lt;/h4&gt;
+&lt;p&gt;大坑，等填&lt;/p&gt;
 </description>
         </item>
         <item>

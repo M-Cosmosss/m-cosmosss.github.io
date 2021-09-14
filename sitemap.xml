@@ -3,27 +3,30 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://cosmos.red/categories/</loc>
-    <lastmod>2021-08-25T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>https://cosmos.red/p/mysql/</loc>
-    <lastmod>2021-08-25T00:00:00+00:00</lastmod>
+    <lastmod>2021-09-13T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://cosmos.red/tags/innodb/</loc>
-    <lastmod>2021-08-25T00:00:00+00:00</lastmod>
+    <lastmod>2021-09-13T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://cosmos.red/p/innodb-%E6%98%AF%E5%A6%82%E4%BD%95%E5%9C%A8-rr-%E4%B8%AD%E8%A7%A3%E5%86%B3%E5%B9%BB%E8%AF%BB%E7%9A%84/</loc>
+    <lastmod>2021-09-13T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://cosmos.red/</loc>
-    <lastmod>2021-08-25T00:00:00+00:00</lastmod>
+    <lastmod>2021-09-13T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://cosmos.red/categories/mysql/</loc>
-    <lastmod>2021-08-25T00:00:00+00:00</lastmod>
+    <lastmod>2021-09-13T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://cosmos.red/tags/mysql/</loc>
-    <lastmod>2021-08-25T00:00:00+00:00</lastmod>
+    <lastmod>2021-09-13T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://cosmos.red/post/</loc>
-    <lastmod>2021-08-25T00:00:00+00:00</lastmod>
+    <lastmod>2021-09-13T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://cosmos.red/tags/</loc>
+    <lastmod>2021-09-13T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://cosmos.red/p/mysql-%E6%8A%80%E6%9C%AF%E5%86%85%E5%B9%95%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/</loc>
     <lastmod>2021-08-25T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://cosmos.red/about/</loc>

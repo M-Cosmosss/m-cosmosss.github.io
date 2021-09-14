@@ -6,14 +6,24 @@
     <description>Recent content in mysql on M-Cosmosss</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 25 Aug 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://cosmos.red/tags/mysql/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 13 Sep 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://cosmos.red/tags/mysql/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>InnoDB</title>
-      <link>https://cosmos.red/p/mysql/</link>
+      <title>Innodb 是如何在 RR 中解决幻读的</title>
+      <link>https://cosmos.red/p/innodb-%E6%98%AF%E5%A6%82%E4%BD%95%E5%9C%A8-rr-%E4%B8%AD%E8%A7%A3%E5%86%B3%E5%B9%BB%E8%AF%BB%E7%9A%84/</link>
+      <pubDate>Mon, 13 Sep 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://cosmos.red/p/innodb-%E6%98%AF%E5%A6%82%E4%BD%95%E5%9C%A8-rr-%E4%B8%AD%E8%A7%A3%E5%86%B3%E5%B9%BB%E8%AF%BB%E7%9A%84/</guid>
+      <description>开坑待填</description>
+    </item>
+    
+    <item>
+      <title>《Mysql 技术内幕》阅读笔记</title>
+      <link>https://cosmos.red/p/mysql-%E6%8A%80%E6%9C%AF%E5%86%85%E5%B9%95%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/</link>
       <pubDate>Wed, 25 Aug 2021 00:00:00 +0000</pubDate>
       
-      <guid>https://cosmos.red/p/mysql/</guid>
-      <description>Mysql P2 Threads Master Thread 包含多个循环（主循环，background，flush，suspend）
+      <guid>https://cosmos.red/p/mysql-%E6%8A%80%E6%9C%AF%E5%86%85%E5%B9%95%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/</guid>
+      <description>Mysql [TOC]
+P2 Threads Master Thread 包含多个循环（主循环，background，flush，suspend）
  日志写入磁盘 合并 Insert Buffer 到磁盘 刷新脏页 删除无用 Undo 页 1.2.x 版本前，刷新脏页等 IO 速度硬编码，版本后添加 innodb_io_capacity 代表磁盘速度，此变量影响刷新页的速度  IO Thread InnoDB 使用 Async IO ，IO Thread 负责这些异步 IO 请求的回调
 Purge Thread 1.1 版本后，回收 Undo 页由主线程转为此线程负责
 Page Cleaner Thread 1.2.x 版本后，刷新脏页由主线程转为此线程负责
