@@ -7,12 +7,51 @@
         <generator>Hugo -- gohugo.io</generator>
         <language>en-us</language>
         <lastBuildDate>Mon, 13 Sep 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://cosmos.red/index.xml" rel="self" type="application/rss+xml" /><item>
-        <title>Innodb 是如何在 RR 中解决幻读的</title>
-        <link>https://cosmos.red/p/innodb-%E6%98%AF%E5%A6%82%E4%BD%95%E5%9C%A8-rr-%E4%B8%AD%E8%A7%A3%E5%86%B3%E5%B9%BB%E8%AF%BB%E7%9A%84/</link>
+        <title>Innodb 是如何实现 RR 并解决幻读的</title>
+        <link>https://cosmos.red/p/innodb-%E6%98%AF%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0-rr-%E5%B9%B6%E8%A7%A3%E5%86%B3%E5%B9%BB%E8%AF%BB%E7%9A%84/</link>
         <pubDate>Mon, 13 Sep 2021 00:00:00 +0000</pubDate>
         
-        <guid>https://cosmos.red/p/innodb-%E6%98%AF%E5%A6%82%E4%BD%95%E5%9C%A8-rr-%E4%B8%AD%E8%A7%A3%E5%86%B3%E5%B9%BB%E8%AF%BB%E7%9A%84/</guid>
-        <description>&lt;img src="https://cosmos.red/p/innodb-%E6%98%AF%E5%A6%82%E4%BD%95%E5%9C%A8-rr-%E4%B8%AD%E8%A7%A3%E5%86%B3%E5%B9%BB%E8%AF%BB%E7%9A%84/c.jpg" alt="Featured image of post Innodb 是如何在 RR 中解决幻读的" /&gt;&lt;p&gt;开坑待填&lt;/p&gt;
+        <guid>https://cosmos.red/p/innodb-%E6%98%AF%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0-rr-%E5%B9%B6%E8%A7%A3%E5%86%B3%E5%B9%BB%E8%AF%BB%E7%9A%84/</guid>
+        <description>&lt;img src="https://cosmos.red/p/innodb-%E6%98%AF%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0-rr-%E5%B9%B6%E8%A7%A3%E5%86%B3%E5%B9%BB%E8%AF%BB%E7%9A%84/c.jpg" alt="Featured image of post Innodb 是如何实现 RR 并解决幻读的" /&gt;&lt;h1 id=&#34;innodb-是如何实现-rr-并解决幻读的&#34;&gt;Innodb 是如何实现 RR 并解决幻读的&lt;/h1&gt;
+&lt;h2 id=&#34;幻读&#34;&gt;幻读&lt;/h2&gt;
+&lt;p&gt;幻读比较容易与不可重复读搞混，先看看他们的定义：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;不可重复读：在当前事务多次读时，读到因其他事务提交而前后不一致的数据&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;幻读：在同一事务中，相同查询条件的多次查询读取的数据总量不一致&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;提出并解决这些事务问题，都是为了保证在单一事务中不受其他事务的影响。&lt;/p&gt;
+&lt;p&gt;解决不可重复读是为了保证，在本事务中 SELECT 得到的结果不会被其他事务影响而改变。一种解决思路是，只需要对 SELECT 的结果行加锁即可。&lt;/p&gt;
+&lt;p&gt;但在此之外还会有其他的干扰情况：就算锁住了查找结果，相同的 SELECT 语句仍然可能出现不一样的结果。因为其他事务的 INSERT 操作可能会插入满足之前 SELECT 条件的新数据行。尽管原 SELECT 语句的行数据保证不变，但再次查找就可能多出了几行，如同幻觉一般。这就是与不可重复读不同的另一种事务问题，幻读。&lt;/p&gt;
+&lt;h2 id=&#34;可重复读-repeatable-read&#34;&gt;可重复读 Repeatable Read&lt;/h2&gt;
+&lt;p&gt;显然，可重复读针对的就是『不可重复读』问题，也是 Innodb 默认的隔离级别&lt;/p&gt;
+&lt;p&gt;其实可以通过一个最简单的例子整体思考下事务的目的以及问题：&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;事务 T1 查找结果为行 A ，然后事务 T2 想更新行 A 中的数据&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;如果要解决『不可重复读』，那么有两种解决思路：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;直接阻止 T2 的操作。&lt;/p&gt;
+&lt;p&gt;在『串行化』隔离级别中，事务中的查找操作也会上锁，因此有着最好的隔离性。在『串行化』以外的隔离级别，也可以使用 **select &amp;hellip; for update / lock in share mode **手动对查找操作上锁。但缺点也显而易见，这么做会导致并发性能极差。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;在不阻止 T2 操作的情况下，有没有方法阻止『不可重复读』？&lt;/p&gt;
+&lt;p&gt;有。其实可以关注到，『不可重复读』要求事务多次读到的数据不变，而不是该数据本身不能变。如果为数据建立快照，就可以同时满足『不变』与『修改』。这种思路可以极大提高并发性能，但尽管符合了『可重复读』的要求，但读到的非实时数据也会成为一个隐患，尤其是在对数据实时性要求高的场合&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;这个例子主要表明：在实现事务隔离的情况下，也可以用一定的妥协来换取性能。毕竟『串行化』的实现最简单也最安全，但并发性能需求在大多数场合中，比绝对的数据一致性更重要！因此 MVCC 应运而生。&lt;/p&gt;
+&lt;h2 id=&#34;快照读与当前读&#34;&gt;快照读与当前读&lt;/h2&gt;
+&lt;h2 id=&#34;多版本并发控制-mvcc&#34;&gt;多版本并发控制 MVCC&lt;/h2&gt;
+&lt;h2 id=&#34;间隙锁与临键锁&#34;&gt;间隙锁与临键锁&lt;/h2&gt;
+&lt;h2 id=&#34;幻读-1&#34;&gt;幻读&lt;/h2&gt;
+&lt;h2 id=&#34;参考链接&#34;&gt;参考链接&lt;/h2&gt;
+&lt;p&gt;[&lt;a class=&#34;link&#34; href=&#34;https://tech.meituan.com/2014/08/20/innodb-lock.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Innodb中的事务隔离级别和锁的关系&lt;/a&gt;](&lt;a class=&#34;link&#34; href=&#34;https://tech.meituan.com/2014/08/20/innodb-lock.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://tech.meituan.com/2014/08/20/innodb-lock.html&lt;/a&gt;)&lt;/p&gt;
 </description>
         </item>
         <item>
@@ -21,7 +60,8 @@
         <pubDate>Wed, 25 Aug 2021 00:00:00 +0000</pubDate>
         
         <guid>https://cosmos.red/p/mysql-%E6%8A%80%E6%9C%AF%E5%86%85%E5%B9%95%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/</guid>
-        <description>&lt;img src="https://cosmos.red/p/mysql-%E6%8A%80%E6%9C%AF%E5%86%85%E5%B9%95%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/b.jpg" alt="Featured image of post 《Mysql 技术内幕》阅读笔记" /&gt;&lt;h1 id=&#34;mysql&#34;&gt;Mysql&lt;/h1&gt;
+        <description>&lt;img src="https://cosmos.red/p/mysql-%E6%8A%80%E6%9C%AF%E5%86%85%E5%B9%95%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/b.jpg" alt="Featured image of post 《Mysql 技术内幕》阅读笔记" /&gt;&lt;p&gt;pixiv：92080599&lt;/p&gt;
+&lt;h1 id=&#34;mysql&#34;&gt;Mysql&lt;/h1&gt;
 &lt;h2 id=&#34;p2&#34;&gt;P2&lt;/h2&gt;
 &lt;h3 id=&#34;threads&#34;&gt;Threads&lt;/h3&gt;
 &lt;h4 id=&#34;master-thread&#34;&gt;Master Thread&lt;/h4&gt;
