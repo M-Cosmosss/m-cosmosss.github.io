@@ -13,7 +13,8 @@
       <pubDate>Mon, 13 Sep 2021 00:00:00 +0000</pubDate>
       
       <guid>https://cosmos.red/p/innodb-%E6%98%AF%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0-rr-%E5%B9%B6%E8%A7%A3%E5%86%B3%E5%B9%BB%E8%AF%BB%E7%9A%84/</guid>
-      <description>Innodb 是如何实现 RR 并解决幻读的 幻读 幻读比较容易与不可重复读搞混，先看看他们的定义：
+      <description>pixiv：92080599
+Innodb 是如何实现 RR 并解决幻读的 幻读 幻读比较容易与不可重复读搞混，先看看他们的定义：
   不可重复读：在当前事务多次读时，读到因其他事务提交而前后不一致的数据
   幻读：在同一事务中，相同查询条件的多次查询读取的数据总量不一致
   提出并解决这些事务问题，都是为了保证在单一事务中不受其他事务的影响。
@@ -25,8 +26,7 @@
  如果要解决『不可重复读』，那么有两种解决思路：
   直接阻止 T2 的操作。
 在『串行化』隔离级别中，事务中的查找操作也会上锁，因此有着最好的隔离性。在『串行化』以外的隔离级别，也可以使用 **select &amp;hellip; for update / lock in share mode **手动对查找操作上锁。但缺点也显而易见，这么做会导致并发性能极差。
-  在不阻止 T2 操作的情况下，有没有方法阻止『不可重复读』？
-有。其实可以关注到，『不可重复读』要求事务多次读到的数据不变，而不是该数据本身不能变。如果为数据建立快照，就可以同时满足『不变』与『修改』。这种思路可以极大提高并发性能，但尽管符合了『可重复读』的要求，但读到的非实时数据也会成为一个隐患，尤其是在对数据实时性要求高的场合</description>
+  在不阻止 T2 操作的情况下，有没有方法阻止『不可重复读』？</description>
     </item>
     
     <item>
@@ -35,8 +35,7 @@
       <pubDate>Wed, 25 Aug 2021 00:00:00 +0000</pubDate>
       
       <guid>https://cosmos.red/p/mysql-%E6%8A%80%E6%9C%AF%E5%86%85%E5%B9%95%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/</guid>
-      <description>pixiv：92080599
-Mysql P2 Threads Master Thread 包含多个循环（主循环，background，flush，suspend）
+      <description>Mysql P2 Threads Master Thread 包含多个循环（主循环，background，flush，suspend）
  日志写入磁盘 合并 Insert Buffer 到磁盘 刷新脏页 删除无用 Undo 页 1.2.x 版本前，刷新脏页等 IO 速度硬编码，版本后添加 innodb_io_capacity 代表磁盘速度，此变量影响刷新页的速度  IO Thread InnoDB 使用 Async IO ，IO Thread 负责这些异步 IO 请求的回调
 Purge Thread 1.1 版本后，回收 Undo 页由主线程转为此线程负责
 Page Cleaner Thread 1.2.x 版本后，刷新脏页由主线程转为此线程负责

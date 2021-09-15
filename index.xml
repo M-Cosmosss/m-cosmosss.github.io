@@ -12,7 +12,8 @@
         <pubDate>Mon, 13 Sep 2021 00:00:00 +0000</pubDate>
         
         <guid>https://cosmos.red/p/innodb-%E6%98%AF%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0-rr-%E5%B9%B6%E8%A7%A3%E5%86%B3%E5%B9%BB%E8%AF%BB%E7%9A%84/</guid>
-        <description>&lt;img src="https://cosmos.red/p/innodb-%E6%98%AF%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0-rr-%E5%B9%B6%E8%A7%A3%E5%86%B3%E5%B9%BB%E8%AF%BB%E7%9A%84/c.jpg" alt="Featured image of post Innodb 是如何实现 RR 并解决幻读的" /&gt;&lt;h1 id=&#34;innodb-是如何实现-rr-并解决幻读的&#34;&gt;Innodb 是如何实现 RR 并解决幻读的&lt;/h1&gt;
+        <description>&lt;img src="https://cosmos.red/p/innodb-%E6%98%AF%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0-rr-%E5%B9%B6%E8%A7%A3%E5%86%B3%E5%B9%BB%E8%AF%BB%E7%9A%84/c.jpg" alt="Featured image of post Innodb 是如何实现 RR 并解决幻读的" /&gt;&lt;p&gt;pixiv：92080599&lt;/p&gt;
+&lt;h1 id=&#34;innodb-是如何实现-rr-并解决幻读的&#34;&gt;Innodb 是如何实现 RR 并解决幻读的&lt;/h1&gt;
 &lt;h2 id=&#34;幻读&#34;&gt;幻读&lt;/h2&gt;
 &lt;p&gt;幻读比较容易与不可重复读搞混，先看看他们的定义：&lt;/p&gt;
 &lt;ul&gt;
@@ -60,8 +61,7 @@
         <pubDate>Wed, 25 Aug 2021 00:00:00 +0000</pubDate>
         
         <guid>https://cosmos.red/p/mysql-%E6%8A%80%E6%9C%AF%E5%86%85%E5%B9%95%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/</guid>
-        <description>&lt;img src="https://cosmos.red/p/mysql-%E6%8A%80%E6%9C%AF%E5%86%85%E5%B9%95%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/b.jpg" alt="Featured image of post 《Mysql 技术内幕》阅读笔记" /&gt;&lt;p&gt;pixiv：92080599&lt;/p&gt;
-&lt;h1 id=&#34;mysql&#34;&gt;Mysql&lt;/h1&gt;
+        <description>&lt;img src="https://cosmos.red/p/mysql-%E6%8A%80%E6%9C%AF%E5%86%85%E5%B9%95%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/b.jpg" alt="Featured image of post 《Mysql 技术内幕》阅读笔记" /&gt;&lt;h1 id=&#34;mysql&#34;&gt;Mysql&lt;/h1&gt;
 &lt;h2 id=&#34;p2&#34;&gt;P2&lt;/h2&gt;
 &lt;h3 id=&#34;threads&#34;&gt;Threads&lt;/h3&gt;
 &lt;h4 id=&#34;master-thread&#34;&gt;Master Thread&lt;/h4&gt;
@@ -503,12 +503,13 @@
 &lt;p&gt;原则 2：查找过程中访问到的对象才会加锁&lt;/p&gt;
 &lt;p&gt;优化 1：索引上的等值查询，给唯一索引加锁的时候，next-key lock 退化为行锁&lt;/p&gt;
 &lt;p&gt;优化 2：索引上的等值查询，向右遍历时且最后一个值不满足等值条件的时候，next-key lock 退化为间隙锁&lt;/p&gt;
-&lt;p&gt;一个 bug：唯一索引上的范围查询会访问到不满足条件的第一个值为止&lt;/p&gt;
+&lt;p&gt;一个 bug：唯一索引上的范围查询会访问到不满足条件的第一个值为止（目前已经在 Mysql 8.0.18 中修复）&lt;/p&gt;
 &lt;/blockquote&gt;
 &lt;h4 id=&#34;临键锁-next-key-lock&#34;&gt;临键锁 Next-Key Lock&lt;/h4&gt;
 &lt;p&gt;结合了记录锁与间隙锁而成，锁定范围为&lt;strong&gt;左开右闭&lt;/strong&gt;区间内的索引&lt;/p&gt;
 &lt;h4 id=&#34;临键锁如何解决幻读&#34;&gt;临键锁如何解决幻读&lt;/h4&gt;
-&lt;p&gt;大坑，等填&lt;/p&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://cosmos.red/p/innodb-%E6%98%AF%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0-rr-%E5%B9%B6%E8%A7%A3%E5%86%B3%E5%B9%BB%E8%AF%BB%E7%9A%84/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Innodb 是如何实现 RR 并解决幻读的&lt;/a&gt;&lt;/p&gt;
 </description>
         </item>
         <item>

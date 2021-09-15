@@ -121,8 +121,7 @@
 </header>
 
     <section class="article-content">
-    <p>pixiv：92080599</p>
-<h1 id="mysql">Mysql</h1>
+    <h1 id="mysql">Mysql</h1>
 <h2 id="p2">P2</h2>
 <h3 id="threads">Threads</h3>
 <h4 id="master-thread">Master Thread</h4>
@@ -564,12 +563,13 @@
 <p>原则 2：查找过程中访问到的对象才会加锁</p>
 <p>优化 1：索引上的等值查询，给唯一索引加锁的时候，next-key lock 退化为行锁</p>
 <p>优化 2：索引上的等值查询，向右遍历时且最后一个值不满足等值条件的时候，next-key lock 退化为间隙锁</p>
-<p>一个 bug：唯一索引上的范围查询会访问到不满足条件的第一个值为止</p>
+<p>一个 bug：唯一索引上的范围查询会访问到不满足条件的第一个值为止（目前已经在 Mysql 8.0.18 中修复）</p>
 </blockquote>
 <h4 id="临键锁-next-key-lock">临键锁 Next-Key Lock</h4>
 <p>结合了记录锁与间隙锁而成，锁定范围为<strong>左开右闭</strong>区间内的索引</p>
 <h4 id="临键锁如何解决幻读">临键锁如何解决幻读</h4>
-<p>大坑，等填</p>
+<p><a class="link" href="https://cosmos.red/p/innodb-%E6%98%AF%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0-rr-%E5%B9%B6%E8%A7%A3%E5%86%B3%E5%B9%BB%E8%AF%BB%E7%9A%84/"  target="_blank" rel="noopener"
+    >Innodb 是如何实现 RR 并解决幻读的</a></p>
 
 </section>
 
