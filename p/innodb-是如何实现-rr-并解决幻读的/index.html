@@ -153,12 +153,50 @@
 <p>有。其实可以关注到，『不可重复读』要求事务多次读到的数据不变，而不是该数据本身不能变。如果为数据建立快照，就可以同时满足『不变』与『修改』。这种思路可以极大提高并发性能，但尽管符合了『可重复读』的要求，但读到的非实时数据也会成为一个隐患，尤其是在对数据实时性要求高的场合</p>
 </li>
 </ol>
-<p>这个例子主要表明：在实现事务隔离的情况下，也可以用一定的妥协来换取性能。毕竟『串行化』的实现最简单也最安全，但并发性能需求在大多数场合中，比绝对的数据一致性更重要！因此 MVCC 应运而生。</p>
-<h2 id="快照读与当前读">快照读与当前读</h2>
+<p>这个例子主要表明：在实现事务隔离的情况下，也可以用一定的妥协来换取性能。毕竟『串行化』的实现最简单也最安全，但并发性能需求在大多数场合中，比绝对的数据一致性更重要！因此多版本并发控制 MVCC 应运而生</p>
 <h2 id="多版本并发控制-mvcc">多版本并发控制 MVCC</h2>
+<p>MVCC 就是 Innodb 对于通过为数据建立快照思路的具体实现。由于事务是可以并发的，同一时间自然可能遇到多组事务间需要解决冲突，所以快照机制的建立必须考虑并发情况，所以需要的也就是 MVCC 本身：多版本并发控制</p>
+<p>MVCC 不仅用在 RR 级别解决『不可重复读』与『幻读』，也在 READ COMMITED 读已提交级别中解决了『脏读』问题</p>
+<h3 id="实现">实现</h3>
+<p>MVCC 有不止一种实现，这里介绍的是 Innodb 的</p>
+<ol>
+<li>
+<p>每个事务在开启时都会获得一个递增的事务版本 id，记录了每个事务开启的先后顺序</p>
+</li>
+<li>
+<p>MVCC 为表创建两个隐藏列，<code>trx_id </code> 与 <code>roll_pointer</code> .前者代表本行数据最新被哪个事务所创建/修改，后者是由 undo log 实现的回滚指针，指向该行的上一个历史版本，形成链表串联成该行完整的历史快照</p>
+</li>
+<li>
+<p>read-view 一致性视图：第一次读（待确认）时会记录下这些数据：</p>
+<ul>
+<li>trx_ids：当前未提交的所有事务 id 组成的数组</li>
+<li>up_limit_id（min）：trx_ids 中的最小值</li>
+<li>low_limit_id（max）：当前所有事务版本 id 的最大值+1，也就是未来下一个出现的事务 id</li>
+<li>creator_trx_id：本事务的 id （也查到称为 current_trx_id 的，暂时没求证）</li>
+</ul>
+<p>在 RR 隔离级别下，read-view 在整个事务生命期间都不会更新</p>
+</li>
+<li>
+<p>在事务期间的查询操作，会进行以下检查：</p>
+<ul>
+<li>若 <code>trx_id</code> &lt; min，说明该行的最晚修改时间一定在本事务开启前，是可见数据</li>
+<li>若 <code>trx_id</code> &gt; max，说明该行的最晚修改时间一定在本事务开启后，不可见，需要通过 <code>roll_pointer</code> 找到可见的历史版本</li>
+<li>若 min &lt; <code>trx_id</code> &lt; max，则无法直接判断，需要在 trx_ids 数组中进行二分查找，确认<code>trx_id</code> 是否存在其中：若存在则说明是不可见版本。反之亦然</li>
+</ul>
+<blockquote>
+<p>Tips：其实第一、二步的判断只是为了提高性能，不然每次查询操作都需要在 trx_ids 数组中二分查找</p>
+</blockquote>
+</li>
+</ol>
+<h2 id="快照读与当前读">快照读与当前读</h2>
+<p>在启用了 MVCC 后，事务中查找操作得到的数据不再一定是最新值，要确保得到最新值只能使用  <code>SELECT ... FOR UPDATE(待验证)</code> ，因此 MVCC 让读操作分为了『快照读』与『当前读』两种，在《InnoDB 技术内幕》成为『一致性锁定/非锁定读』</p>
+<p>INSERT 与 UPDATE 实际上也经历了『当前读』，这点也直接关系到最后的问题</p>
 <h2 id="间隙锁与临键锁">间隙锁与临键锁</h2>
 <h2 id="幻读-1">幻读</h2>
-<h2 id="参考链接">参考链接</h2>
+<p>于是，<code>InnoDB 在 RR 下不会产生幻读</code> 是正确的吗？这个问题很难直接给出答案</p>
+<p>倘若在事务中没有产生『当前读』，那确实不可能会出现幻读；但『当前读』出现后……</p>
+<p>未完待续</p>
+<h2 id="参考文章">参考文章</h2>
 <p>[<a class="link" href="https://tech.meituan.com/2014/08/20/innodb-lock.html"  target="_blank" rel="noopener"
     >Innodb中的事务隔离级别和锁的关系</a>](<a class="link" href="https://tech.meituan.com/2014/08/20/innodb-lock.html"  target="_blank" rel="noopener"
     >https://tech.meituan.com/2014/08/20/innodb-lock.html</a>)</p>
@@ -368,11 +406,15 @@
   <ol>
     <li><a href="#幻读">幻读</a></li>
     <li><a href="#可重复读-repeatable-read">可重复读 Repeatable Read</a></li>
+    <li><a href="#多版本并发控制-mvcc">多版本并发控制 MVCC</a>
+      <ol>
+        <li><a href="#实现">实现</a></li>
+      </ol>
+    </li>
     <li><a href="#快照读与当前读">快照读与当前读</a></li>
-    <li><a href="#多版本并发控制-mvcc">多版本并发控制 MVCC</a></li>
     <li><a href="#间隙锁与临键锁">间隙锁与临键锁</a></li>
     <li><a href="#幻读-1">幻读</a></li>
-    <li><a href="#参考链接">参考链接</a></li>
+    <li><a href="#参考文章">参考文章</a></li>
   </ol>
 </nav>
                 </div>
