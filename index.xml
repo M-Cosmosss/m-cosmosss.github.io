@@ -7,14 +7,16 @@
         <generator>Hugo -- gohugo.io</generator>
         <language>en-us</language>
         <lastBuildDate>Mon, 13 Sep 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://cosmos.red/index.xml" rel="self" type="application/rss+xml" /><item>
-        <title>Innodb 是如何解决脏读 / 幻读的</title>
-        <link>https://cosmos.red/p/innodb-%E6%98%AF%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%E8%84%8F%E8%AF%BB-/-%E5%B9%BB%E8%AF%BB%E7%9A%84/</link>
+        <title>Innodb 是如何解决脏读 / 幻读 / 不可重复读的</title>
+        <link>https://cosmos.red/p/innodb-%E6%98%AF%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%E8%84%8F%E8%AF%BB-/-%E5%B9%BB%E8%AF%BB-/-%E4%B8%8D%E5%8F%AF%E9%87%8D%E5%A4%8D%E8%AF%BB%E7%9A%84/</link>
         <pubDate>Mon, 13 Sep 2021 00:00:00 +0000</pubDate>
         
-        <guid>https://cosmos.red/p/innodb-%E6%98%AF%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%E8%84%8F%E8%AF%BB-/-%E5%B9%BB%E8%AF%BB%E7%9A%84/</guid>
-        <description>&lt;img src="https://cosmos.red/p/innodb-%E6%98%AF%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%E8%84%8F%E8%AF%BB-/-%E5%B9%BB%E8%AF%BB%E7%9A%84/c.jpg" alt="Featured image of post Innodb 是如何解决脏读 / 幻读的" /&gt;&lt;p&gt;pixiv：92080599&lt;/p&gt;
-&lt;h1 id=&#34;innodb-是如何解决脏读--幻读的&#34;&gt;Innodb 是如何解决脏读 / 幻读的&lt;/h1&gt;
-&lt;h2 id=&#34;幻读&#34;&gt;幻读&lt;/h2&gt;
+        <guid>https://cosmos.red/p/innodb-%E6%98%AF%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%E8%84%8F%E8%AF%BB-/-%E5%B9%BB%E8%AF%BB-/-%E4%B8%8D%E5%8F%AF%E9%87%8D%E5%A4%8D%E8%AF%BB%E7%9A%84/</guid>
+        <description>&lt;img src="https://cosmos.red/p/innodb-%E6%98%AF%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%E8%84%8F%E8%AF%BB-/-%E5%B9%BB%E8%AF%BB-/-%E4%B8%8D%E5%8F%AF%E9%87%8D%E5%A4%8D%E8%AF%BB%E7%9A%84/c.jpg" alt="Featured image of post Innodb 是如何解决脏读 / 幻读 / 不可重复读的" /&gt;&lt;p&gt;pixiv：92080599&lt;/p&gt;
+&lt;h1 id=&#34;innodb-是如何解决脏读--幻读--不可重复读的&#34;&gt;Innodb 是如何解决脏读 / 幻读 / 不可重复读的&lt;/h1&gt;
+&lt;h2 id=&#34;概念&#34;&gt;概念&lt;/h2&gt;
+&lt;p&gt;脏读：在当前事务读到其他事务修改并且未提交的数据&lt;/p&gt;
+&lt;p&gt;幻读比较容易与不可重复读搞混：&lt;/p&gt;
 &lt;p&gt;幻读比较容易与不可重复读搞混，先看看他们的定义：&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;
@@ -26,7 +28,7 @@
 &lt;/ul&gt;
 &lt;p&gt;提出并解决这些事务问题，都是为了保证在单一事务中不受其他事务的影响。&lt;/p&gt;
 &lt;p&gt;解决不可重复读是为了保证，在本事务中 SELECT 得到的结果不会被其他事务影响而改变。一种解决思路是，只需要对 SELECT 的结果行加锁即可。&lt;/p&gt;
-&lt;p&gt;但在此之外还会有其他的干扰情况：就算锁住了查找结果，相同的 SELECT 语句仍然可能出现不一样的结果。因为其他事务的 INSERT 操作可能会插入满足之前 SELECT 条件的新数据行。尽管原 SELECT 语句的行数据保证不变，但再次查找就可能多出了几行，如同幻觉一般。这就是与不可重复读不同的另一种事务问题，幻读。&lt;/p&gt;
+&lt;p&gt;但在此之外还会有其他的干扰情况：就算锁住了查找结果，相同的 SELECT 语句仍然可能出现不一样的结果。因为其他事务的 INSERT 操作可能会插入满足上次 SELECT 条件的新数据行。尽管原 SELECT 语句的查询结果行数据不变，但再次查找就可能多出了几行，如同幻觉一般。这就是与不可重复读不同的另一种事务问题，幻读。&lt;/p&gt;
 &lt;h2 id=&#34;可重复读-repeatable-read&#34;&gt;可重复读 Repeatable Read&lt;/h2&gt;
 &lt;p&gt;显然，可重复读针对的就是『不可重复读』问题，也是 Innodb 默认的隔离级别&lt;/p&gt;
 &lt;p&gt;其实可以通过一个最简单的例子整体思考下事务的目的以及问题：&lt;/p&gt;
@@ -636,7 +638,6 @@
 &lt;li&gt;因为快照中的都是历史数据不会被修改，因此不需要上锁，从而大大提高并发性能&lt;/li&gt;
 &lt;li&gt;是否启用要看事务隔离级别&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;具体还是在 MVCC 部分讲&lt;/p&gt;
 &lt;p&gt;一致性锁定读：&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;某些情况需要显式地对读取操作加锁来保证数据一致性&lt;/li&gt;
@@ -644,6 +645,8 @@
 &lt;li&gt;SELECT&amp;hellip;LOCK IN SHARE MODE：对读取行加 S 锁&lt;/li&gt;
 &lt;li&gt;必须在事务中才生效&lt;/li&gt;
 &lt;/ul&gt;
+&lt;p&gt;具体转到&lt;a class=&#34;link&#34; href=&#34;https://cosmos.red/p/innodb-%E6%98%AF%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0-rr-%E5%B9%B6%E8%A7%A3%E5%86%B3%E5%B9%BB%E8%AF%BB%E7%9A%84/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Innodb 是如何解决脏读 / 幻读 / 不可重复读的&lt;/a&gt;&lt;/p&gt;
 &lt;h3 id=&#34;自增锁&#34;&gt;自增锁&lt;/h3&gt;
 &lt;p&gt;对含有自增属性的表进行插入操作时，为了解决并发问题而存在的特殊表锁&lt;/p&gt;
 &lt;p&gt;根据参数 innodb_autoinc_lock_mode 共有三种运作模式&lt;/p&gt;
@@ -680,7 +683,7 @@
 &lt;p&gt;结合了记录锁与间隙锁而成，锁定范围为&lt;strong&gt;左开右闭&lt;/strong&gt;区间内的索引&lt;/p&gt;
 &lt;h4 id=&#34;临键锁如何解决幻读&#34;&gt;临键锁如何解决幻读&lt;/h4&gt;
 &lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://cosmos.red/p/innodb-%E6%98%AF%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0-rr-%E5%B9%B6%E8%A7%A3%E5%86%B3%E5%B9%BB%E8%AF%BB%E7%9A%84/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;Innodb 是如何实现 RR 并解决幻读的&lt;/a&gt;&lt;/p&gt;
+    &gt;Innodb 是如何解决脏读 / 幻读 / 不可重复读的&lt;/a&gt;&lt;/p&gt;
 </description>
         </item>
         <item>

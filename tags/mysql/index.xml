@@ -8,18 +8,20 @@
     <language>en-us</language>
     <lastBuildDate>Mon, 13 Sep 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://cosmos.red/tags/mysql/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Innodb 是如何解决脏读 / 幻读的</title>
-      <link>https://cosmos.red/p/innodb-%E6%98%AF%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%E8%84%8F%E8%AF%BB-/-%E5%B9%BB%E8%AF%BB%E7%9A%84/</link>
+      <title>Innodb 是如何解决脏读 / 幻读 / 不可重复读的</title>
+      <link>https://cosmos.red/p/innodb-%E6%98%AF%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%E8%84%8F%E8%AF%BB-/-%E5%B9%BB%E8%AF%BB-/-%E4%B8%8D%E5%8F%AF%E9%87%8D%E5%A4%8D%E8%AF%BB%E7%9A%84/</link>
       <pubDate>Mon, 13 Sep 2021 00:00:00 +0000</pubDate>
       
-      <guid>https://cosmos.red/p/innodb-%E6%98%AF%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%E8%84%8F%E8%AF%BB-/-%E5%B9%BB%E8%AF%BB%E7%9A%84/</guid>
+      <guid>https://cosmos.red/p/innodb-%E6%98%AF%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%E8%84%8F%E8%AF%BB-/-%E5%B9%BB%E8%AF%BB-/-%E4%B8%8D%E5%8F%AF%E9%87%8D%E5%A4%8D%E8%AF%BB%E7%9A%84/</guid>
       <description>pixiv：92080599
-Innodb 是如何解决脏读 / 幻读的 幻读 幻读比较容易与不可重复读搞混，先看看他们的定义：
+Innodb 是如何解决脏读 / 幻读 / 不可重复读的 概念 脏读：在当前事务读到其他事务修改并且未提交的数据
+幻读比较容易与不可重复读搞混：
+幻读比较容易与不可重复读搞混，先看看他们的定义：
   不可重复读：在当前事务多次读时，读到因其他事务提交而前后不一致的数据
   幻读：在同一事务中，相同查询条件的多次查询读取的数据总量不一致
   提出并解决这些事务问题，都是为了保证在单一事务中不受其他事务的影响。
 解决不可重复读是为了保证，在本事务中 SELECT 得到的结果不会被其他事务影响而改变。一种解决思路是，只需要对 SELECT 的结果行加锁即可。
-但在此之外还会有其他的干扰情况：就算锁住了查找结果，相同的 SELECT 语句仍然可能出现不一样的结果。因为其他事务的 INSERT 操作可能会插入满足之前 SELECT 条件的新数据行。尽管原 SELECT 语句的行数据保证不变，但再次查找就可能多出了几行，如同幻觉一般。这就是与不可重复读不同的另一种事务问题，幻读。
+但在此之外还会有其他的干扰情况：就算锁住了查找结果，相同的 SELECT 语句仍然可能出现不一样的结果。因为其他事务的 INSERT 操作可能会插入满足上次 SELECT 条件的新数据行。尽管原 SELECT 语句的查询结果行数据不变，但再次查找就可能多出了几行，如同幻觉一般。这就是与不可重复读不同的另一种事务问题，幻读。
 可重复读 Repeatable Read 显然，可重复读针对的就是『不可重复读』问题，也是 Innodb 默认的隔离级别
 其实可以通过一个最简单的例子整体思考下事务的目的以及问题：
  事务 T1 查找结果为行 A ，然后事务 T2 想更新行 A 中的数据

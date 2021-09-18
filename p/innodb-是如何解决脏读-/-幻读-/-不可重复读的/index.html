@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='MVCC 与 间隙锁'><title>Innodb 是如何解决脏读 / 幻读 / 不可重复读的</title>
+
+<link rel='canonical' href='https://cosmos.red/p/innodb-%E6%98%AF%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%E8%84%8F%E8%AF%BB-/-%E5%B9%BB%E8%AF%BB-/-%E4%B8%8D%E5%8F%AF%E9%87%8D%E5%A4%8D%E8%AF%BB%E7%9A%84/'>
+
+<link rel="stylesheet" href="/scss/style.min.css"><meta property='og:title' content='Innodb 是如何解决脏读 / 幻读 / 不可重复读的'>
+<meta property='og:description' content='MVCC 与 间隙锁'>
+<meta property='og:url' content='https://cosmos.red/p/innodb-%E6%98%AF%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%E8%84%8F%E8%AF%BB-/-%E5%B9%BB%E8%AF%BB-/-%E4%B8%8D%E5%8F%AF%E9%87%8D%E5%A4%8D%E8%AF%BB%E7%9A%84/'>
+<meta property='og:site_name' content='M-Cosmosss'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='innodb' /><meta property='article:tag' content='mysql' /><meta property='article:published_time' content='2021-09-13T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2021-09-13T00:00:00&#43;00:00'/><meta property='og:image' content='https://cosmos.red/p/innodb-%E6%98%AF%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%E8%84%8F%E8%AF%BB-/-%E5%B9%BB%E8%AF%BB-/-%E4%B8%8D%E5%8F%AF%E9%87%8D%E5%A4%8D%E8%AF%BB%E7%9A%84/c.jpg' />
+<meta name="twitter:title" content="Innodb 是如何解决脏读 / 幻读 / 不可重复读的">
+<meta name="twitter:description" content="MVCC 与 间隙锁"><meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content='https://cosmos.red/p/innodb-%E6%98%AF%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%E8%84%8F%E8%AF%BB-/-%E5%B9%BB%E8%AF%BB-/-%E4%B8%8D%E5%8F%AF%E9%87%8D%E5%A4%8D%E8%AF%BB%E7%9A%84/c.jpg' />
+    <link rel="shortcut icon" href="/img/cosmos.jpg" />
+
+    </head>
+    <body class="
+    article-page has-toc
+">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex 
+    
+        extended
+    
+">
+    
+        <div id="article-toolbar">
+            <a href="https://cosmos.red" class="back-home">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-chevron-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="15 6 9 12 15 18" />
+</svg>
+
+
+
+                <span>Back</span>
+            </a>
+        </div>
+    
+<main class="main full-width">
+    <article class="has-image main-article">
+    <header class="article-header">
+        <div class="article-image">
+            <a href="/p/innodb-%E6%98%AF%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%E8%84%8F%E8%AF%BB-/-%E5%B9%BB%E8%AF%BB-/-%E4%B8%8D%E5%8F%AF%E9%87%8D%E5%A4%8D%E8%AF%BB%E7%9A%84/">
+                <img src="/p/innodb-%E6%98%AF%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%E8%84%8F%E8%AF%BB-/-%E5%B9%BB%E8%AF%BB-/-%E4%B8%8D%E5%8F%AF%E9%87%8D%E5%A4%8D%E8%AF%BB%E7%9A%84/c_huc444c62702561e9beb046bfb10664c2f_4430149_800x0_resize_q75_box.jpg"
+                        srcset="/p/innodb-%E6%98%AF%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%E8%84%8F%E8%AF%BB-/-%E5%B9%BB%E8%AF%BB-/-%E4%B8%8D%E5%8F%AF%E9%87%8D%E5%A4%8D%E8%AF%BB%E7%9A%84/c_huc444c62702561e9beb046bfb10664c2f_4430149_800x0_resize_q75_box.jpg 800w, /p/innodb-%E6%98%AF%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%E8%84%8F%E8%AF%BB-/-%E5%B9%BB%E8%AF%BB-/-%E4%B8%8D%E5%8F%AF%E9%87%8D%E5%A4%8D%E8%AF%BB%E7%9A%84/c_huc444c62702561e9beb046bfb10664c2f_4430149_1600x0_resize_q75_box.jpg 1600w"
+                        width="800" 
+                        height="450" 
+                        loading="lazy"
+                        alt="Featured image of post Innodb 是如何解决脏读 / 幻读 / 不可重复读的" />
+                
+            </a>
+        </div>
+    
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/mysql/" style="background-color: #123456; color: #fff;">
+                Mysql
+            </a>
+        
+    </header>
+    
+
+    <h2 class="article-title">
+        <a href="/p/innodb-%E6%98%AF%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%E8%84%8F%E8%AF%BB-/-%E5%B9%BB%E8%AF%BB-/-%E4%B8%8D%E5%8F%AF%E9%87%8D%E5%A4%8D%E8%AF%BB%E7%9A%84/">Innodb 是如何解决脏读 / 幻读 / 不可重复读的</a>
+    </h2>
+
+    
+    <h3 class="article-subtitle">
+        MVCC 与 间隙锁
+    </h3>
+    
+
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Sep 13, 2021</time>
+            </div>
+        
+
+        
+    </footer>
+    
+</div>
+</header>
+
+    <section class="article-content">
+    <p>pixiv：92080599</p>
+<h1 id="innodb-是如何解决脏读--幻读--不可重复读的">Innodb 是如何解决脏读 / 幻读 / 不可重复读的</h1>
+<h2 id="概念">概念</h2>
+<p>脏读：在当前事务读到其他事务修改并且未提交的数据</p>
+<p>幻读比较容易与不可重复读搞混：</p>
+<p>幻读比较容易与不可重复读搞混，先看看他们的定义：</p>
+<ul>
+<li>
+<p>不可重复读：在当前事务多次读时，读到因其他事务提交而前后不一致的数据</p>
+</li>
+<li>
+<p>幻读：在同一事务中，相同查询条件的多次查询读取的数据总量不一致</p>
+</li>
+</ul>
+<p>提出并解决这些事务问题，都是为了保证在单一事务中不受其他事务的影响。</p>
+<p>解决不可重复读是为了保证，在本事务中 SELECT 得到的结果不会被其他事务影响而改变。一种解决思路是，只需要对 SELECT 的结果行加锁即可。</p>
+<p>但在此之外还会有其他的干扰情况：就算锁住了查找结果，相同的 SELECT 语句仍然可能出现不一样的结果。因为其他事务的 INSERT 操作可能会插入满足上次 SELECT 条件的新数据行。尽管原 SELECT 语句的查询结果行数据不变，但再次查找就可能多出了几行，如同幻觉一般。这就是与不可重复读不同的另一种事务问题，幻读。</p>
+<h2 id="可重复读-repeatable-read">可重复读 Repeatable Read</h2>
+<p>显然，可重复读针对的就是『不可重复读』问题，也是 Innodb 默认的隔离级别</p>
+<p>其实可以通过一个最简单的例子整体思考下事务的目的以及问题：</p>
+<blockquote>
+<p>事务 T1 查找结果为行 A ，然后事务 T2 想更新行 A 中的数据</p>
+</blockquote>
+<p>如果要解决『不可重复读』，那么有两种解决思路：</p>
+<ol>
+<li>
+<p>直接阻止 T2 的操作。</p>
+<p>在『串行化』隔离级别中，事务中的查找操作也会上锁，因此有着最好的隔离性。在『串行化』以外的隔离级别，也可以使用 <strong>select &hellip; for update / lock in share mode</strong> 手动对查找操作上锁。但缺点也显而易见，这么做会导致并发性能极差。</p>
+</li>
+<li>
+<p>在不阻止 T2 操作的情况下，有没有方法阻止『不可重复读』？</p>
+<p>有。其实可以关注到，『不可重复读』要求事务多次读到的数据不变，而不是该数据本身不能变。如果为数据建立快照，就可以同时满足『不变』与『修改』。这种思路可以极大提高并发性能，但尽管符合了『可重复读』的要求，但读到的非实时数据也会成为一个隐患，尤其是在对数据实时性要求高的场合</p>
+</li>
+</ol>
+<p>这个例子主要表明：在实现事务隔离的情况下，也可以用一定的妥协来换取性能。毕竟『串行化』的实现最简单也最安全，但并发性能需求在大多数场合中，比保证数据的绝对实时性更重要。因此多版本并发控制 MVCC 应运而生</p>
+<h2 id="多版本并发控制-mvcc">多版本并发控制 MVCC</h2>
+<p>MVCC 就是 Innodb 对于通过为数据建立快照思路的具体实现。由于事务是可以并发的，同一时间自然可能遇到多组事务间需要解决冲突，所以需要的也就是 MVCC 本身：多版本并发控制</p>
+<p>MVCC 不仅用在 RR 级别解决『不可重复读』与『幻读』，也在 READ COMMITED 读已提交级别中解决了『脏读』问题</p>
+<h3 id="实现">实现</h3>
+<p>MVCC 有不止一种实现，这里介绍的是 Innodb 的</p>
+<ol>
+<li>
+<p>每个事务在开启时都会获得一个递增的事务版本 id，记录了每个事务开启的先后顺序</p>
+</li>
+<li>
+<p>MVCC 为表创建两个隐藏列，<code>trx_id</code> 与 <code>roll_pointer</code> .前者记录了本行数据最新被创建/修改的事务 id，后者是由 undo log 实现的回滚指针，指向该行的上一个历史版本，形成链表串联成该行完整的历史快照</p>
+</li>
+<li>
+<p>read-view 一致性视图：第一次读时会记录下这些数据：</p>
+<ul>
+<li>trx_ids：当前未提交的所有事务 id 组成的数组</li>
+<li>up_limit_id（min）：trx_ids 中的最小值</li>
+<li>low_limit_id（max）：当前所有事务版本 id 的最大值+1，也就是未来下一个出现的事务 id</li>
+<li>creator_trx_id：本事务的 id （也查到称为 current_trx_id 的，暂时没求证）</li>
+</ul>
+<p>在 RR 隔离级别下，read-view 在整个事务生命期间都不会更新</p>
+</li>
+<li>
+<p>在事务期间的查询操作，会进行以下检查：</p>
+<ul>
+<li>若 <code>trx_id</code> &lt; min，说明该行的最晚修改时间一定在本事务开启前，是可见数据</li>
+<li>若 <code>trx_id</code> &gt; max，说明该行的最晚修改时间一定在本事务开启后，不可见，需要通过 <code>roll_pointer</code> 找到可见的历史版本</li>
+<li>若 min &lt; <code>trx_id</code> &lt; max，则无法直接判断，需要在 trx_ids 数组中进行二分查找，确认<code>trx_id</code> 是否存在其中：若存在则说明是不可见版本。反之亦然</li>
+</ul>
+<blockquote>
+<p>Tips：其实第一、二步的判断只是为了提高性能，不然每次查询操作都需要在 trx_ids 数组中二分查找</p>
+</blockquote>
+</li>
+</ol>
+<h3 id="mvcc-与-脏读">MVCC 与 脏读</h3>
+<p>前文也提到了，MVCC 也在 RC 隔离级别中解决了『脏读』，其实与 MVCC 在 RR 中解决『幻读』的机制很相似，唯一的区别是 read-view 一致性视图变为了：在事务中每次 SELECT 操作中都会重新生成一次，推演一下其影响就能明白， RC 隔离级别为什么不存在脏读但是『不可重复读』了</p>
+<h2 id="快照读与当前读">快照读与当前读</h2>
+<p>在启用了 MVCC 后，事务中查找操作得到的数据不再一定是最新值，要确保得到最新值只能使用  <code>SELECT ... FOR UPDATE / LOCK IN SHARE MODE</code> ，因此 MVCC 让读操作分为了『快照读』与『当前读』两种，在《InnoDB 技术内幕》中称为『一致性锁定/非锁定读』</p>
+<p>MVCC 可以确保在 RR 隔离级别下，『快照读』中不会出现幻读现象，但『快照读』和『当前读』在事务里同时出现时，就可能出现幻读</p>
+<p>INSERT 与 UPDATE 实际上也算是一种『当前读』，重点在于这两个操作会使事务脱离『快照』，接触到『当前』，这点很重要，后文中还会提起</p>
+<h2 id="间隙锁与临键锁">间隙锁与临键锁</h2>
+<p>简单重复一下概念</p>
+<ul>
+<li>间隙锁：对索引的一段区间范围上锁，使得无法在对应区间插入新行，区间为左开右开</li>
+<li>临键锁：对索引的一段区间范围上锁，区间为左开右闭。其本质实现就是间隙锁+行锁，作用也相当于就是将间隙锁与行锁组合在一起使用，从而做到『左开右闭』。临键锁是『当前读』时的默认加锁单位，因此主要会讨论临键锁，但基本可以将其视为间隙锁+行锁即可</li>
+</ul>
+<blockquote>
+<p>间隙锁和临键锁只存在于 RR 隔离级别下，因为其本身只能用来解决幻读，在其他隔离级别也无意义</p>
+</blockquote>
+<p>间隙锁的出现是为了实现 <code>阻止一个范围内出现新行</code> ，而之所以有这个需求是为了在『当前读』的情况下解决『幻读』。</p>
+<p>间隙锁之间不冲突，因此两个事务可以同时申请同一个范围的间隙锁，间隙锁的唯一目的就是阻止范围内的插入操作</p>
+<p>临键锁的加锁原则比较复杂和底层，网上也有很多对着源码分析的文章，因此我打算仅记录归纳后的总结。示例表 test ：</p>
+<table>
+<thead>
+<tr>
+<th>id 主键</th>
+<th>uid 普通索引</th>
+<th>gid 唯一索引</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>2</td>
+<td>5</td>
+<td>5</td>
+</tr>
+<tr>
+<td>3</td>
+<td>10</td>
+<td>10</td>
+</tr>
+</tbody>
+</table>
+<h3 id="非唯一索引">非唯一索引</h3>
+<p>也就是普通索引，被『当前读』显式查找的结果，及其前后间隙都会被临键锁锁定</p>
+<blockquote>
+<p>注意！UPDATE INSERT DELETE 等『写操作』本身也需要『当前读』，因此它们也会导致临键锁锁定</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>T1</th>
+<th>T2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>select * from test where uid = 5 for update;</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>insert into test values (4,2,2);</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>临键锁锁定区间为 uid的 (1,10)，也就是查找结果<code>(2,5,5)</code>再加上它上下的间隙，是开区间。T2 事务被阻塞</p>
+<blockquote>
+<p>可以思考一个问题，在此处场景中，select 并不是范围而是等值查询，只有可能查到 uid = 5的行，就算接下来 insert uid 为1~4，6~10之间的行，也不可能发生幻读，那为什么不只给<code>(2,5,5)</code> 这一行上行锁呢？</p>
+<p>首先是由于此处为普通索引，没有唯一性，因此还可以插入 uid = 5 的行，这就会导致幻读。其次这仍然导致了本不应该受影响的 uid 范围被禁止 insert，为什么不设计另一种机制，仅禁止 uid = 5 行的 insert？ 关于这个问题网上鲜有讨论（也可能是我孤陋寡闻=。=），目前我看到的有一定信服力的解释是：原因和索引使用的 B+ Tree 结构有关，只能实现到这种地步。如果有了解这个问题的欢迎评论指正 Orz</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>T1</th>
+<th>T2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>select * from test where uid &gt;= 5 for update;</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>insert into test values (4,6,2);</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>临键锁锁定区间为 uid的 (1,+supernum) 。supernum 是数据库维护的最大的值</p>
+<h3 id="唯一索引">唯一索引</h3>
+<p>唯一索引最大的区别在于等值查找场景时，由于能确保唯一性所以可以降级到行锁即可，而普通索引的话只能维持在临键锁</p>
+<h3 id="总结">总结</h3>
+<p>其实关于临键锁的锁区间范围规律，归根到底还是为了阻止幻读的可能而锁住可能产生幻读的空间。我认为不必过多关注其实现，因为实际锁住的范围一定是<strong>大于等于</strong>理论上需要锁住的范围，只要清楚这点，就能从另一种逆推的思维也能得到相近的结果。</p>
+<p>而之所以是<strong>大于等于</strong>而不是<strong>等于</strong>，一方面是由于实现手段的不够理想（如普通索引的等值查询会锁住额外的范围），另一方面则是 Innodb 本身也存在 bug，丁奇老师在《Mysql 实战45讲》中就提出过一个临键锁范围的 bug，直到 8.0.18 版本才被修复。所以也不能一味地相信源码实现的正确性。</p>
+<h2 id="结语qa">结语＆QA</h2>
+<ul>
+<li>
+<p>于是，<code>InnoDB 在 RR 下不会产生幻读</code> 这句话是正确的吗？这个问题很难直接给出答案</p>
+<p>倘若在事务中没有产生『当前读』，那在 MVCC 机制的作用下，确实不可能会出现幻读；但『当前读』出现后，先『快照读』再『当前读』就可能产生幻读；倘若只使用『当前读』，那临键锁机制也可以确保阻止幻读，但实际上这种情况的并发性能已经下降到『串行化』级别了</p>
+<p>只能说在 RR 下，InnoDB 解决了仅『快照读』与仅『当前读』情况下的『幻读』问题，但混合使用时则没有解决</p>
+</li>
+<li>
+<p>RR 隔离级别下，read-view 一致性视图只在事务的第一次 select 操作后才建立</p>
+<table>
+<thead>
+<tr>
+<th>T1</th>
+<th>T2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>update test set uid = 2 where id = 1;</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>update test set uid = 3 where id =1;</td>
+</tr>
+<tr>
+<td>select * from test where id = 1;</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>那有没有可能发生如上表，最终 T1 查找结果为 （1，3，1）而不是预期的（1，2，1）类似幻读的情况？</p>
+<p>A：不可能，因为 update 操作也是『当前写』，会上锁，T2 事务的更新操作无法执行</p>
+</li>
+</ul>
+<h2 id="参考文章">参考文章</h2>
+<p><a class="link" href="https://tech.meituan.com/2014/08/20/innodb-lock.html"  target="_blank" rel="noopener"
+    >Innodb中的事务隔离级别和锁的关系</a></p>
+<p><a class="link" href="https://time.geekbang.org/column/intro/139"  target="_blank" rel="noopener"
+    >MySQL 实战45讲</a></p>
+<p>文中如有错误，欢迎在评论区指出 Orzzzz</p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/innodb/">innodb</a>
+        
+            <a href="/tags/mysql/">mysql</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    <aside class="related-contents--wrapper">
+    
+    
+        <h2 class="section-title">Related contents</h2>
+        <div class="related-contents">
+            <div class="flex article-list--tile">
+                
+                    
+<article class="has-image">
+    <a href="/p/mysql-%E6%8A%80%E6%9C%AF%E5%86%85%E5%B9%95%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/">
+        
+        
+            <div class="article-image">
+                <img src="/p/mysql-%E6%8A%80%E6%9C%AF%E5%86%85%E5%B9%95%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/b.1d90c77a7ec230c3adf595293d2c5140_hu9e6b598faf5d55dba82b6284d47de078_365277_250x150_fill_q75_box_smart1.jpg" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy" 
+                        data-key="" 
+                        data-hash="md5-HZDHen7CMMOt9ZUpPSxRQA==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">《Mysql 技术内幕》阅读笔记</h2>
+        </div>
+    </a>
+</article>
+                
+            </div>
+        </div>
+    
+</aside>
+
+     
+     
+        
+    <script src='//cdn.jsdelivr.net/npm/@waline/client/dist/Waline.min.js'></script>
+<div id="waline" class="waline-container"></div>
+<style>
+    .waline-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+    }
+    .waline-container .vcount {
+        color: var(--card-text-color-main);
+    }
+</style><script>
+    
+    new Waline({"dark":"html[data-scheme=\"dark\"]","el":"#waline","emoji":["https://cdn.jsdelivr.net/gh/walinejs/emojis/weibo","https://cdn.jsdelivr.net/gh/walinejs/emojis@1.0.0/bilibili","https://cdn.jsdelivr.net/gh/walinejs/emojis@1.0.0/tieba","https://cdn.jsdelivr.net/gh/walinejs/emojis@1.0.0/alus"],"locale":{"admin":"Admin"},"placeholder":"Now Loading...","requiredMeta":["name","email","url"],"serverURL":"https://blog-waline-5m09kxgj8-m-cosmosss.vercel.app/","visitor":true});
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2020 - 
+        
+        2021 M-Cosmosss
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.2.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer="true"
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer="true"
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.css"integrity="sha256-c0uckgykQ9v5k&#43;IqViZOZKc47Jn7KQil4/MP3ySA3F8="crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.css"integrity="sha256-SBLU4vv6CA6lHsZ1XyTdhyjJxCjPif/TRkjnsyGAGnE="crossorigin="anonymous"
+            >
+
+            </main>
+    
+        <aside class="sidebar right-sidebar sticky">
+            <section class="widget archives">
+                <div class="widget-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+                </div>
+                <h2 class="widget-title section-title">Table of contents</h2>
+                
+                <div class="widget--toc">
+                    <nav id="TableOfContents">
+  <ol>
+    <li><a href="#概念">概念</a></li>
+    <li><a href="#可重复读-repeatable-read">可重复读 Repeatable Read</a></li>
+    <li><a href="#多版本并发控制-mvcc">多版本并发控制 MVCC</a>
+      <ol>
+        <li><a href="#实现">实现</a></li>
+        <li><a href="#mvcc-与-脏读">MVCC 与 脏读</a></li>
+      </ol>
+    </li>
+    <li><a href="#快照读与当前读">快照读与当前读</a></li>
+    <li><a href="#间隙锁与临键锁">间隙锁与临键锁</a>
+      <ol>
+        <li><a href="#非唯一索引">非唯一索引</a></li>
+        <li><a href="#唯一索引">唯一索引</a></li>
+        <li><a href="#总结">总结</a></li>
+      </ol>
+    </li>
+    <li><a href="#结语qa">结语＆QA</a></li>
+    <li><a href="#参考文章">参考文章</a></li>
+  </ol>
+</nav>
+                </div>
+            </section>
+        </aside>
+    
+
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.5/dist/vibrant.min.js"integrity="sha256-5NovOZc4iwiAWTYIFiIM7DxKUXKWvpVEuMEPLzcm5/g="crossorigin="anonymous"
+                defer="false"
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

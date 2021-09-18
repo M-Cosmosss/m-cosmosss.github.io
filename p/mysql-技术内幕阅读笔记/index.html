@@ -525,7 +525,6 @@
 <li>因为快照中的都是历史数据不会被修改，因此不需要上锁，从而大大提高并发性能</li>
 <li>是否启用要看事务隔离级别</li>
 </ul>
-<p>具体还是在 MVCC 部分讲</p>
 <p>一致性锁定读：</p>
 <ul>
 <li>某些情况需要显式地对读取操作加锁来保证数据一致性</li>
@@ -533,6 +532,8 @@
 <li>SELECT&hellip;LOCK IN SHARE MODE：对读取行加 S 锁</li>
 <li>必须在事务中才生效</li>
 </ul>
+<p>具体转到<a class="link" href="https://cosmos.red/p/innodb-%E6%98%AF%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0-rr-%E5%B9%B6%E8%A7%A3%E5%86%B3%E5%B9%BB%E8%AF%BB%E7%9A%84/"  target="_blank" rel="noopener"
+    >Innodb 是如何解决脏读 / 幻读 / 不可重复读的</a></p>
 <h3 id="自增锁">自增锁</h3>
 <p>对含有自增属性的表进行插入操作时，为了解决并发问题而存在的特殊表锁</p>
 <p>根据参数 innodb_autoinc_lock_mode 共有三种运作模式</p>
@@ -569,7 +570,7 @@
 <p>结合了记录锁与间隙锁而成，锁定范围为<strong>左开右闭</strong>区间内的索引</p>
 <h4 id="临键锁如何解决幻读">临键锁如何解决幻读</h4>
 <p><a class="link" href="https://cosmos.red/p/innodb-%E6%98%AF%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0-rr-%E5%B9%B6%E8%A7%A3%E5%86%B3%E5%B9%BB%E8%AF%BB%E7%9A%84/"  target="_blank" rel="noopener"
-    >Innodb 是如何实现 RR 并解决幻读的</a></p>
+    >Innodb 是如何解决脏读 / 幻读 / 不可重复读的</a></p>
 
 </section>
 
@@ -612,11 +613,11 @@
                 
                     
 <article class="has-image">
-    <a href="/p/innodb-%E6%98%AF%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%E8%84%8F%E8%AF%BB-/-%E5%B9%BB%E8%AF%BB%E7%9A%84/">
+    <a href="/p/innodb-%E6%98%AF%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%E8%84%8F%E8%AF%BB-/-%E5%B9%BB%E8%AF%BB-/-%E4%B8%8D%E5%8F%AF%E9%87%8D%E5%A4%8D%E8%AF%BB%E7%9A%84/">
         
         
             <div class="article-image">
-                <img src="/p/innodb-%E6%98%AF%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%E8%84%8F%E8%AF%BB-/-%E5%B9%BB%E8%AF%BB%E7%9A%84/c.0343f1198605224944eedddc1c05e892_huc444c62702561e9beb046bfb10664c2f_4430149_250x150_fill_q75_box_smart1.jpg" 
+                <img src="/p/innodb-%E6%98%AF%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%E8%84%8F%E8%AF%BB-/-%E5%B9%BB%E8%AF%BB-/-%E4%B8%8D%E5%8F%AF%E9%87%8D%E5%A4%8D%E8%AF%BB%E7%9A%84/c.0343f1198605224944eedddc1c05e892_huc444c62702561e9beb046bfb10664c2f_4430149_250x150_fill_q75_box_smart1.jpg" 
                         width="250" 
                         height="150" 
                         loading="lazy" 
@@ -627,7 +628,7 @@
         
 
         <div class="article-details">
-            <h2 class="article-title">Innodb 是如何解决脏读 / 幻读的</h2>
+            <h2 class="article-title">Innodb 是如何解决脏读 / 幻读 / 不可重复读的</h2>
         </div>
     </a>
 </article>
