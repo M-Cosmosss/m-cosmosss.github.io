@@ -55,5 +55,14 @@ innodb_buffer_pool_instances 设定缓冲池数量
       <description>Now Loading!!! </description>
     </item>
     
+    <item>
+      <title></title>
+      <link>https://cosmos.red/p/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://cosmos.red/p/</guid>
+      <description>计网经典基础问题  001 为什么 TCP 建立连接需要三次握手 005 为什么 DNS 使用 UDP 协议 012 为什么 TCP 协议有性能问题 013 为什么 UDP 头只有 8 个字节 017 为什么 TCP/IP 协议会拆分数据 018 为什么流媒体直播的延迟很高 019 为什么 HTTPS 需要 7 次握手以及 9 倍时延 020 为什么 TCP 协议有粘包问题 021 为什么 TCP 协议有 TIME_WAIT 状态 026 为什么 MAC 地址不需要全球唯一 027 为什么 IPv6 难以取代 IPv4 028 为什么集群需要 Overlay 网络  </description>
+    </item>
+    
   </channel>
 </rss>
