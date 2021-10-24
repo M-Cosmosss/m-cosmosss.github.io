@@ -336,6 +336,16 @@
 &lt;h4 id=&#34;redo-log-能否恢复&#34;&gt;redo log 能否恢复&lt;/h4&gt;
 &lt;p&gt;纯物理日志实现 redo log 完全不依赖物理页的状态，并且是幂等性的，因此可以恢复 partial write&lt;/p&gt;
 &lt;p&gt;而 innoDB 的 redo 采用的是物理逻辑结合型的日志。物理到具体的哪个 page，页内操作是逻辑的。这种方式既实现了物理日志带来的幂等性（以物理页为整体），又拥有逻辑日志带来的轻量性（物理页内修改是逻辑日志）。所以物理页内修改不是幂等的，需要使用 doublewrite 技术来保证写入的成功&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;2021-10-24 更新：再次总结一下 double write 必要性的问题（感谢&lt;a class=&#34;link&#34; href=&#34;https://github.red/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;@E99p1ant&lt;/a&gt;的指正）&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;redo log 不具有幂等性，因此恢复需要物理页的上一个完整状态&lt;/li&gt;
+&lt;li&gt;假如没有 double write ，直接向目标页写入，若发生 partial write ，则该物理页的上一个完整状态将永久失去，因此 redo log 无法恢复损坏页面&lt;/li&gt;
+&lt;li&gt;启用 double write 后，第一步写入目标变为了磁盘上的  double write buffer ，无论这一步成功与否，都不影响目标页的上一个完整状态。而从 double write buffer 复制写入到目标页的这第二步是具有幂等性的，就算失败也只需要再写一次&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Tips：以上内容具有一点猜想成分，由于没去查看源码，也还没有发现此处非常深入的分析资料，可能与事实有出入。例如，启用 double write 后的第一步写，不清楚需不需要上一个状态物理页，如果需要的话还需要从目标页复制一份过来？&lt;/p&gt;
+&lt;/blockquote&gt;
 &lt;h4 id=&#34;redo-log-是否需要保护&#34;&gt;redo log 是否需要保护&lt;/h4&gt;
 &lt;p&gt;redo 日志的页大小一般设计为 512 Byte，不会出现 partial write&lt;/p&gt;
 &lt;h4 id=&#34;others&#34;&gt;others&lt;/h4&gt;
